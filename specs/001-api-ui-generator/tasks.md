@@ -24,12 +24,12 @@
 
 **Purpose**: Initialize the Electron + React + TypeScript project with build tooling, linting, formatting, and test infrastructure.
 
-- [ ] T001 Initialize Electron + React project with electron-vite scaffolding, create package.json with scripts (dev, build, test, lint, format, type-check, package) per quickstart.md
-- [ ] T002 Configure TypeScript strict mode — create tsconfig.json files for main, renderer, and sandbox process targets with `strict: true`, `noExplicitAny`, path alias `@/` pointing to `src/renderer/`
-- [ ] T003 [P] Install and configure ESLint 9 with `@typescript-eslint/parser`, `@typescript-eslint/no-explicit-any: error`, `max-lines` rule (300), `no-unused-vars`, `no-unused-imports` in eslint.config.js
-- [ ] T004 [P] Install and configure Prettier with consistent formatting rules in .prettierrc
-- [ ] T005 Configure husky + lint-staged for pre-commit hooks running lint, type-check, and test on staged files per constitution local verification gate
-- [ ] T006 [P] Set up Vitest (unit/integration), React Testing Library (component tests), Playwright (E2E), and axe-core (accessibility) test infrastructure with configuration files
+- [X] T001 Initialize Electron + React project with electron-vite scaffolding, create package.json with scripts (dev, build, test, lint, format, type-check, package) per quickstart.md
+- [X] T002 Configure TypeScript strict mode — create tsconfig.json files for main, renderer, and sandbox process targets with `strict: true`, `noExplicitAny`, path alias `@/` pointing to `src/renderer/`
+- [X] T003 [P] Install and configure ESLint 9 with `@typescript-eslint/parser`, `@typescript-eslint/no-explicit-any: error`, `max-lines` rule (300), `no-unused-vars`, `no-unused-imports` in eslint.config.js
+- [X] T004 [P] Install and configure Prettier with consistent formatting rules in .prettierrc
+- [X] T005 Configure husky + lint-staged for pre-commit hooks running lint, type-check, and test on staged files per constitution local verification gate
+- [X] T006 [P] Set up Vitest (unit/integration), React Testing Library (component tests), Playwright (E2E), and axe-core (accessibility) test infrastructure with configuration files
 
 ---
 
@@ -39,16 +39,16 @@
 
 **⚠️ CRITICAL**: No user story work can begin until this phase is complete.
 
-- [ ] T007 Define all shared TypeScript types and interfaces from data-model.md in src/shared/types/ — APISpec, NormalizedSpec, NormalizedEndpoint, NormalizedOperation, NormalizedModel, SecurityScheme, SpecSource, SpecMetadata, ValidationError, GeneratedInterface, SandboxState, InterfaceVersion, APIConnection, AuthMethod, ConnectionStatus, CLIState, Plugin, Tab, ChatMessage, MessageAttachment, CustomizationRequest, ConsoleEntry, ConsoleRequest, ConsoleResponse, ApplicationState
-- [ ] T008 [P] Define IPC channel name constants for all domains (cli, auth, proxy, versions, plugins, app) and push notification channel names per electron-ipc-channels.md contract in src/shared/ipc-channels.ts
-- [ ] T009 [P] Define application constants (default split ratio 30/70, max chat panel width 85%, min 15%, max restart retries 5, request timeouts, CSP policy template, disallowed code patterns list, sandbox message type allowlists) in src/shared/constants.ts
-- [ ] T010 Create Electron main process entry — BrowserWindow creation with `contextIsolation: true`, `nodeIntegration: false`, `sandbox: true`, and preload script reference in src/main/index.ts
-- [ ] T011 Create preload script — expose the full `ExperienceUIBridge` interface via `contextBridge.exposeInMainWorld('experienceUI', {...})` with typed stubs for all IPC domains (cli, auth, proxy, versions, plugins, app) and push notification listener registration per electron-ipc-channels.md in src/main/preload.ts
-- [ ] T012 Create React root mount with StrictMode and global error boundary in src/renderer/index.tsx
-- [ ] T013 [P] Set up design system — Tailwind CSS 4 config with CSS custom properties for spacing, typography, color (light/dark themes), border-radius tokens; global stylesheet with base reset and theme variables in src/renderer/styles/
-- [ ] T014 [P] Build common UI primitives — Button, IconButton, Modal, Dialog, StatusBadge, LoadingSpinner, ProgressBar, ErrorBoundary, EmptyState, Tooltip components using Radix UI primitives + Tailwind in src/renderer/components/common/
-- [ ] T015 Create minimal App shell component (placeholder layout, renders empty container) with Zustand app-level store for theme, chatPanelWidth, and consoleVisible in src/renderer/App.tsx and src/renderer/stores/app-store.ts
-- [ ] T016 [P] Create sample API spec test fixtures — valid OpenAPI 3.0 spec, valid Swagger 2.0 spec, valid GraphQL schema, invalid/malformed spec, empty spec (no endpoints), spec with external refs, large spec (50+ endpoints) in tests/fixtures/
+- [X] T007 Define all shared TypeScript types and interfaces from data-model.md in src/shared/types/ — APISpec, NormalizedSpec, NormalizedEndpoint, NormalizedOperation, NormalizedModel, SecurityScheme, SpecSource, SpecMetadata, ValidationError, GeneratedInterface, SandboxState, InterfaceVersion, APIConnection, AuthMethod, ConnectionStatus, CLIState, Plugin, Tab, ChatMessage, MessageAttachment, CustomizationRequest, ConsoleEntry, ConsoleRequest, ConsoleResponse, ApplicationState
+- [X] T008 [P] Define IPC channel name constants for all domains (cli, auth, proxy, versions, plugins, app) and push notification channel names per electron-ipc-channels.md contract in src/shared/ipc-channels.ts
+- [X] T009 [P] Define application constants (default split ratio 30/70, max chat panel width 85%, min 15%, max restart retries 5, request timeouts, CSP policy template, disallowed code patterns list, sandbox message type allowlists) in src/shared/constants.ts
+- [X] T010 Create Electron main process entry — BrowserWindow creation with `contextIsolation: true`, `nodeIntegration: false`, `sandbox: true`, and preload script reference in src/main/index.ts
+- [X] T011 Create preload script — expose the full `ExperienceUIBridge` interface via `contextBridge.exposeInMainWorld('experienceUI', {...})` with typed stubs for all IPC domains (cli, auth, proxy, versions, plugins, app) and push notification listener registration per electron-ipc-channels.md in src/main/preload.ts
+- [X] T012 Create React root mount with StrictMode and global error boundary in src/renderer/index.tsx
+- [X] T013 [P] Set up design system — Tailwind CSS 4 config with CSS custom properties for spacing, typography, color (light/dark themes), border-radius tokens; global stylesheet with base reset and theme variables in src/renderer/styles/
+- [X] T014 [P] Build common UI primitives — Button, IconButton, Modal, Dialog, StatusBadge, LoadingSpinner, ProgressBar, ErrorBoundary, EmptyState, Tooltip components using Radix UI primitives + Tailwind in src/renderer/components/common/
+- [X] T015 Create minimal App shell component (placeholder layout, renders empty container) with Zustand app-level store for theme, chatPanelWidth, and consoleVisible in src/renderer/App.tsx and src/renderer/stores/app-store.ts
+- [X] T016 [P] Create sample API spec test fixtures — valid OpenAPI 3.0 spec, valid Swagger 2.0 spec, valid GraphQL schema, invalid/malformed spec, empty spec (no endpoints), spec with external refs, large spec (50+ endpoints) in tests/fixtures/
 
 **Checkpoint**: Foundation ready — user story implementation can now begin
 

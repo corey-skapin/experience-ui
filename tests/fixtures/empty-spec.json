@@ -1,0 +1,12 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Empty API",
+    "version": "1.0.0",
+    "description": "An API spec with no endpoints"
+  },
+  "paths": {},
+  "components": {
+    "schemas": {}
+  }
+}

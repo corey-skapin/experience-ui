@@ -1,0 +1,75 @@
+type Query {
+  """Get a list of products"""
+  products(limit: Int, offset: Int): [Product!]!
+  """Get a single product by ID"""
+  product(id: ID!): Product
+  """Get a list of categories"""
+  categories: [Category!]!
+  """Get the current user"""
+  me: User
+}
+
+type Mutation {
+  """Create a new product"""
+  createProduct(input: CreateProductInput!): Product!
+  """Update an existing product"""
+  updateProduct(id: ID!, input: UpdateProductInput!): Product
+  """Delete a product"""
+  deleteProduct(id: ID!): Boolean!
+  """Add a product to cart"""
+  addToCart(productId: ID!, quantity: Int!): Cart!
+}
+
+type Product {
+  id: ID!
+  name: String!
+  description: String
+  price: Float!
+  stock: Int!
+  category: Category
+  createdAt: String!
+  updatedAt: String!
+}
+
+type Category {
+  id: ID!
+  name: String!
+  slug: String!
+  products: [Product!]!
+}
+
+type User {
+  id: ID!
+  email: String!
+  name: String!
+  cart: Cart
+}
+
+type Cart {
+  id: ID!
+  items: [CartItem!]!
+  total: Float!
+}
+
+type CartItem {
+  id: ID!
+  product: Product!
+  quantity: Int!
+  subtotal: Float!
+}
+
+input CreateProductInput {
+  name: String!
+  description: String
+  price: Float!
+  stock: Int!
+  categoryId: ID
+}
+
+input UpdateProductInput {
+  name: String
+  description: String
+  price: Float
+  stock: Int
+  categoryId: ID
+}
