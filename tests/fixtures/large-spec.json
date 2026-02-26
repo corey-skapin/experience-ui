@@ -850,7 +850,7 @@
     },
     "/categories": {
       "get": {
-        "operationId": "listCategories",
+        "operationId": "listCategorys",
         "summary": "List all categories",
         "tags": [
           "categories"
@@ -888,7 +888,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/Categorie"
+                    "$ref": "#/components/schemas/Category"
                   }
                 }
               }
@@ -900,8 +900,8 @@
         }
       },
       "post": {
-        "operationId": "createCategorie",
-        "summary": "Create a new categorie",
+        "operationId": "createCategory",
+        "summary": "Create a new category",
         "tags": [
           "categories"
         ],
@@ -910,18 +910,18 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/NewCategorie"
+                "$ref": "#/components/schemas/NewCategory"
               }
             }
           }
         },
         "responses": {
           "201": {
-            "description": "Categorie created",
+            "description": "Category created",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Categorie"
+                  "$ref": "#/components/schemas/Category"
                 }
               }
             }
@@ -932,16 +932,16 @@
         }
       }
     },
-    "/categories/{categorieId}": {
+    "/categories/{categoryId}": {
       "get": {
-        "operationId": "getCategorie",
-        "summary": "Get a categorie by ID",
+        "operationId": "getCategory",
+        "summary": "Get a category by ID",
         "tags": [
           "categories"
         ],
         "parameters": [
           {
-            "name": "categorieId",
+            "name": "categoryId",
             "in": "path",
             "required": true,
             "schema": {
@@ -951,29 +951,29 @@
         ],
         "responses": {
           "200": {
-            "description": "A categorie",
+            "description": "A category",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Categorie"
+                  "$ref": "#/components/schemas/Category"
                 }
               }
             }
           },
           "404": {
-            "description": "Categorie not found"
+            "description": "Category not found"
           }
         }
       },
       "put": {
-        "operationId": "updateCategorie",
-        "summary": "Replace a categorie",
+        "operationId": "updateCategory",
+        "summary": "Replace a category",
         "tags": [
           "categories"
         ],
         "parameters": [
           {
-            "name": "categorieId",
+            "name": "categoryId",
             "in": "path",
             "required": true,
             "schema": {
@@ -986,36 +986,36 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/NewCategorie"
+                "$ref": "#/components/schemas/NewCategory"
               }
             }
           }
         },
         "responses": {
           "200": {
-            "description": "Categorie updated",
+            "description": "Category updated",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Categorie"
+                  "$ref": "#/components/schemas/Category"
                 }
               }
             }
           },
           "404": {
-            "description": "Categorie not found"
+            "description": "Category not found"
           }
         }
       },
       "patch": {
-        "operationId": "patchCategorie",
-        "summary": "Partially update a categorie",
+        "operationId": "patchCategory",
+        "summary": "Partially update a category",
         "tags": [
           "categories"
         ],
         "parameters": [
           {
-            "name": "categorieId",
+            "name": "categoryId",
             "in": "path",
             "required": true,
             "schema": {
@@ -1028,36 +1028,36 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/NewCategorie"
+                "$ref": "#/components/schemas/NewCategory"
               }
             }
           }
         },
         "responses": {
           "200": {
-            "description": "Categorie patched",
+            "description": "Category patched",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Categorie"
+                  "$ref": "#/components/schemas/Category"
                 }
               }
             }
           },
           "404": {
-            "description": "Categorie not found"
+            "description": "Category not found"
           }
         }
       },
       "delete": {
-        "operationId": "deleteCategorie",
-        "summary": "Delete a categorie",
+        "operationId": "deleteCategory",
+        "summary": "Delete a category",
         "tags": [
           "categories"
         ],
         "parameters": [
           {
-            "name": "categorieId",
+            "name": "categoryId",
             "in": "path",
             "required": true,
             "schema": {
@@ -1067,25 +1067,25 @@
         ],
         "responses": {
           "204": {
-            "description": "Categorie deleted"
+            "description": "Category deleted"
           },
           "404": {
-            "description": "Categorie not found"
+            "description": "Category not found"
           }
         }
       }
     },
-    "/categories/{categorieId}/products": {
+    "/categories/{categoryId}/products": {
       "get": {
-        "operationId": "getCategorieProducts",
-        "summary": "Get products for a categorie",
+        "operationId": "getCategoryProducts",
+        "summary": "Get products for a category",
         "tags": [
           "categories",
           "products"
         ],
         "parameters": [
           {
-            "name": "categorieId",
+            "name": "categoryId",
             "in": "path",
             "required": true,
             "schema": {
@@ -1108,7 +1108,7 @@
             }
           },
           "404": {
-            "description": "Categorie not found"
+            "description": "Category not found"
           }
         }
       }
@@ -1607,7 +1607,7 @@
     },
     "/inventory": {
       "get": {
-        "operationId": "listInventorys",
+        "operationId": "listInventoryItems",
         "summary": "List all inventory",
         "tags": [
           "inventory"
@@ -1645,7 +1645,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/Inventory"
+                    "$ref": "#/components/schemas/InventoryItem"
                   }
                 }
               }
@@ -1657,8 +1657,8 @@
         }
       },
       "post": {
-        "operationId": "createInventory",
-        "summary": "Create a new inventory",
+        "operationId": "createInventoryItem",
+        "summary": "Create a new inventory item",
         "tags": [
           "inventory"
         ],
@@ -1667,18 +1667,18 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/NewInventory"
+                "$ref": "#/components/schemas/NewInventoryItem"
               }
             }
           }
         },
         "responses": {
           "201": {
-            "description": "Inventory created",
+            "description": "InventoryItem created",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Inventory"
+                  "$ref": "#/components/schemas/InventoryItem"
                 }
               }
             }
@@ -1689,16 +1689,16 @@
         }
       }
     },
-    "/inventory/{inventoryId}": {
+    "/inventory/{inventory_itemId}": {
       "get": {
-        "operationId": "getInventory",
-        "summary": "Get a inventory by ID",
+        "operationId": "getInventoryItem",
+        "summary": "Get a inventory item by ID",
         "tags": [
           "inventory"
         ],
         "parameters": [
           {
-            "name": "inventoryId",
+            "name": "inventory_itemId",
             "in": "path",
             "required": true,
             "schema": {
@@ -1708,29 +1708,29 @@
         ],
         "responses": {
           "200": {
-            "description": "A inventory",
+            "description": "A inventory item",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Inventory"
+                  "$ref": "#/components/schemas/InventoryItem"
                 }
               }
             }
           },
           "404": {
-            "description": "Inventory not found"
+            "description": "InventoryItem not found"
           }
         }
       },
       "put": {
-        "operationId": "updateInventory",
-        "summary": "Replace a inventory",
+        "operationId": "updateInventoryItem",
+        "summary": "Replace a inventory item",
         "tags": [
           "inventory"
         ],
         "parameters": [
           {
-            "name": "inventoryId",
+            "name": "inventory_itemId",
             "in": "path",
             "required": true,
             "schema": {
@@ -1743,36 +1743,36 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/NewInventory"
+                "$ref": "#/components/schemas/NewInventoryItem"
               }
             }
           }
         },
         "responses": {
           "200": {
-            "description": "Inventory updated",
+            "description": "InventoryItem updated",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Inventory"
+                  "$ref": "#/components/schemas/InventoryItem"
                 }
               }
             }
           },
           "404": {
-            "description": "Inventory not found"
+            "description": "InventoryItem not found"
           }
         }
       },
       "patch": {
-        "operationId": "patchInventory",
-        "summary": "Partially update a inventory",
+        "operationId": "patchInventoryItem",
+        "summary": "Partially update a inventory item",
         "tags": [
           "inventory"
         ],
         "parameters": [
           {
-            "name": "inventoryId",
+            "name": "inventory_itemId",
             "in": "path",
             "required": true,
             "schema": {
@@ -1785,36 +1785,36 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/NewInventory"
+                "$ref": "#/components/schemas/NewInventoryItem"
               }
             }
           }
         },
         "responses": {
           "200": {
-            "description": "Inventory patched",
+            "description": "InventoryItem patched",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Inventory"
+                  "$ref": "#/components/schemas/InventoryItem"
                 }
               }
             }
           },
           "404": {
-            "description": "Inventory not found"
+            "description": "InventoryItem not found"
           }
         }
       },
       "delete": {
-        "operationId": "deleteInventory",
-        "summary": "Delete a inventory",
+        "operationId": "deleteInventoryItem",
+        "summary": "Delete a inventory item",
         "tags": [
           "inventory"
         ],
         "parameters": [
           {
-            "name": "inventoryId",
+            "name": "inventory_itemId",
             "in": "path",
             "required": true,
             "schema": {
@@ -1824,17 +1824,17 @@
         ],
         "responses": {
           "204": {
-            "description": "Inventory deleted"
+            "description": "InventoryItem deleted"
           },
           "404": {
-            "description": "Inventory not found"
+            "description": "InventoryItem not found"
           }
         }
       }
     },
     "/addresses": {
       "get": {
-        "operationId": "listAddresses",
+        "operationId": "listAddresss",
         "summary": "List all addresses",
         "tags": [
           "addresses"
@@ -1872,7 +1872,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/Addresse"
+                    "$ref": "#/components/schemas/Address"
                   }
                 }
               }
@@ -1884,8 +1884,8 @@
         }
       },
       "post": {
-        "operationId": "createAddresse",
-        "summary": "Create a new addresse",
+        "operationId": "createAddress",
+        "summary": "Create a new address",
         "tags": [
           "addresses"
         ],
@@ -1894,18 +1894,18 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/NewAddresse"
+                "$ref": "#/components/schemas/NewAddress"
               }
             }
           }
         },
         "responses": {
           "201": {
-            "description": "Addresse created",
+            "description": "Address created",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Addresse"
+                  "$ref": "#/components/schemas/Address"
                 }
               }
             }
@@ -1916,16 +1916,16 @@
         }
       }
     },
-    "/addresses/{addresseId}": {
+    "/addresses/{addressId}": {
       "get": {
-        "operationId": "getAddresse",
-        "summary": "Get a addresse by ID",
+        "operationId": "getAddress",
+        "summary": "Get a address by ID",
         "tags": [
           "addresses"
         ],
         "parameters": [
           {
-            "name": "addresseId",
+            "name": "addressId",
             "in": "path",
             "required": true,
             "schema": {
@@ -1935,29 +1935,29 @@
         ],
         "responses": {
           "200": {
-            "description": "A addresse",
+            "description": "A address",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Addresse"
+                  "$ref": "#/components/schemas/Address"
                 }
               }
             }
           },
           "404": {
-            "description": "Addresse not found"
+            "description": "Address not found"
           }
         }
       },
       "put": {
-        "operationId": "updateAddresse",
-        "summary": "Replace a addresse",
+        "operationId": "updateAddress",
+        "summary": "Replace a address",
         "tags": [
           "addresses"
         ],
         "parameters": [
           {
-            "name": "addresseId",
+            "name": "addressId",
             "in": "path",
             "required": true,
             "schema": {
@@ -1970,36 +1970,36 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/NewAddresse"
+                "$ref": "#/components/schemas/NewAddress"
               }
             }
           }
         },
         "responses": {
           "200": {
-            "description": "Addresse updated",
+            "description": "Address updated",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Addresse"
+                  "$ref": "#/components/schemas/Address"
                 }
               }
             }
           },
           "404": {
-            "description": "Addresse not found"
+            "description": "Address not found"
           }
         }
       },
       "patch": {
-        "operationId": "patchAddresse",
-        "summary": "Partially update a addresse",
+        "operationId": "patchAddress",
+        "summary": "Partially update a address",
         "tags": [
           "addresses"
         ],
         "parameters": [
           {
-            "name": "addresseId",
+            "name": "addressId",
             "in": "path",
             "required": true,
             "schema": {
@@ -2012,36 +2012,36 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/NewAddresse"
+                "$ref": "#/components/schemas/NewAddress"
               }
             }
           }
         },
         "responses": {
           "200": {
-            "description": "Addresse patched",
+            "description": "Address patched",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Addresse"
+                  "$ref": "#/components/schemas/Address"
                 }
               }
             }
           },
           "404": {
-            "description": "Addresse not found"
+            "description": "Address not found"
           }
         }
       },
       "delete": {
-        "operationId": "deleteAddresse",
-        "summary": "Delete a addresse",
+        "operationId": "deleteAddress",
+        "summary": "Delete a address",
         "tags": [
           "addresses"
         ],
         "parameters": [
           {
-            "name": "addresseId",
+            "name": "addressId",
             "in": "path",
             "required": true,
             "schema": {
@@ -2051,10 +2051,10 @@
         ],
         "responses": {
           "204": {
-            "description": "Addresse deleted"
+            "description": "Address deleted"
           },
           "404": {
-            "description": "Addresse not found"
+            "description": "Address not found"
           }
         }
       }
@@ -2687,7 +2687,7 @@
           }
         }
       },
-      "Categorie": {
+      "Category": {
         "type": "object",
         "required": [
           "id",
@@ -2722,7 +2722,7 @@
           }
         }
       },
-      "NewCategorie": {
+      "NewCategory": {
         "type": "object",
         "required": [
           "name"
@@ -2858,7 +2858,7 @@
           }
         }
       },
-      "Inventory": {
+      "InventoryItem": {
         "type": "object",
         "required": [
           "id",
@@ -2893,7 +2893,7 @@
           }
         }
       },
-      "NewInventory": {
+      "NewInventoryItem": {
         "type": "object",
         "required": [
           "name"
@@ -2915,7 +2915,7 @@
           }
         }
       },
-      "Addresse": {
+      "Address": {
         "type": "object",
         "required": [
           "id",
@@ -2950,7 +2950,7 @@
           }
         }
       },
-      "NewAddresse": {
+      "NewAddress": {
         "type": "object",
         "required": [
           "name"
