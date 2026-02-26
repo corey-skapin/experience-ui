@@ -1,0 +1,13 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Empty API",
+    "version": "1.0.0",
+    "description": "An OpenAPI spec with no paths or operations — used to test empty-content handling (FR-004)."
+  },
+  "servers": [{ "url": "https://empty.example.com/v1" }],
+  "paths": {},
+  "components": {
+    "schemas": {}
+  }
+}

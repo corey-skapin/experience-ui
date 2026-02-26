@@ -27,8 +27,8 @@ The Electron main process spawns the Copilot CLI as a child process and communic
 ```typescript
 interface CLIRequest {
   jsonrpc: '2.0';
-  id: number;                // Monotonically increasing request ID
-  method: string;            // Method name
+  id: number; // Monotonically increasing request ID
+  method: string; // Method name
   params?: Record<string, unknown>;
 }
 ```
@@ -38,9 +38,10 @@ interface CLIRequest {
 ```typescript
 interface CLIResponse {
   jsonrpc: '2.0';
-  id: number;                // Matches request ID
-  result?: unknown;          // On success
-  error?: {                  // On failure
+  id: number; // Matches request ID
+  result?: unknown; // On success
+  error?: {
+    // On failure
     code: number;
     message: string;
     data?: unknown;
@@ -68,10 +69,10 @@ interface CLIStreamChunk {
   jsonrpc: '2.0';
   method: 'stream/chunk';
   params: {
-    requestId: number;       // Original request ID
-    chunk: string;           // Partial content
-    done: boolean;           // Whether this is the final chunk
-    index: number;           // Chunk sequence number
+    requestId: number; // Original request ID
+    chunk: string; // Partial content
+    done: boolean; // Whether this is the final chunk
+    index: number; // Chunk sequence number
   };
 }
 ```
@@ -81,6 +82,7 @@ interface CLIStreamChunk {
 ## Methods
 
 ### `initialize`
+
 Handshake — verify CLI is ready and exchange capability information.
 
 ```typescript
@@ -116,6 +118,7 @@ Handshake — verify CLI is ready and exchange capability information.
 ```
 
 ### `generate`
+
 Generate a UI interface from a parsed API specification.
 
 ```typescript
@@ -150,6 +153,7 @@ Generate a UI interface from a parsed API specification.
 ```
 
 ### `customize`
+
 Apply a natural language modification to an existing generated interface.
 
 ```typescript
@@ -183,6 +187,7 @@ Apply a natural language modification to an existing generated interface.
 ```
 
 ### `clarify`
+
 CLI asks user for clarification when a request is ambiguous.
 
 ```typescript
@@ -200,6 +205,7 @@ CLI asks user for clarification when a request is ambiguous.
 ```
 
 ### `chat`
+
 General-purpose chat message (not tied to generation/customization).
 
 ```typescript
@@ -233,18 +239,18 @@ General-purpose chat message (not tied to generation/customization).
 
 ## Error Codes
 
-| Code | Name | Description |
-|------|------|-------------|
-| -32700 | Parse Error | Invalid JSON |
-| -32600 | Invalid Request | Missing required fields |
-| -32601 | Method Not Found | Unknown method name |
-| -32602 | Invalid Params | Malformed parameters |
-| -32603 | Internal Error | CLI internal error |
-| -32000 | Generation Failed | Code generation failed |
+| Code   | Name                 | Description                        |
+| ------ | -------------------- | ---------------------------------- |
+| -32700 | Parse Error          | Invalid JSON                       |
+| -32600 | Invalid Request      | Missing required fields            |
+| -32601 | Method Not Found     | Unknown method name                |
+| -32602 | Invalid Params       | Malformed parameters               |
+| -32603 | Internal Error       | CLI internal error                 |
+| -32000 | Generation Failed    | Code generation failed             |
 | -32001 | Customization Failed | Customization could not be applied |
-| -32002 | Spec Invalid | Provided spec is invalid |
-| -32003 | Context Too Large | Input exceeds context window |
-| -32004 | Rate Limited | Too many requests |
+| -32002 | Spec Invalid         | Provided spec is invalid           |
+| -32003 | Context Too Large    | Input exceeds context window       |
+| -32004 | Rate Limited         | Too many requests                  |
 
 ---
 
@@ -275,12 +281,12 @@ Main Process                    Copilot CLI
 
 ## Timeout & Retry Policy
 
-| Method | Timeout | Retries | Backoff |
-|--------|---------|---------|---------|
-| `initialize` | 10s | 3 | 2s, 5s, 10s |
-| `generate` | 60s | 1 | N/A |
-| `customize` | 30s | 1 | N/A |
-| `chat` | 15s | 2 | 3s, 6s |
+| Method       | Timeout | Retries | Backoff     |
+| ------------ | ------- | ------- | ----------- |
+| `initialize` | 10s     | 3       | 2s, 5s, 10s |
+| `generate`   | 60s     | 1       | N/A         |
+| `customize`  | 30s     | 1       | N/A         |
+| `chat`       | 15s     | 2       | 3s, 6s      |
 
 ## Backpressure
 

@@ -34,32 +34,32 @@ gh copilot --version
 
 ## Tech Stack
 
-| Category | Technology | Version | Purpose |
-|----------|-----------|---------|---------|
-| **Runtime** | Electron | 34.x | Desktop shell, IPC, window management |
-| **Language** | TypeScript | 5.x (strict) | Type-safe development |
-| **UI Framework** | React | 19.x | Component-based UI |
-| **State Management** | Zustand | 5.x | Lightweight, hook-based stores |
-| **Styling** | Tailwind CSS | 4.x | Utility-first CSS with design tokens |
-| **UI Primitives** | Radix UI | latest | Accessible component primitives |
-| **Icons** | lucide-react | latest | Consistent icon set |
-| **Layout** | react-resizable-panels | latest | Accessible split panes |
-| **Virtualization** | @tanstack/virtual | latest | Performant list rendering |
-| **Bundler** | Vite + electron-vite | latest | Fast dev/build for Electron |
-| **In-app Bundler** | esbuild | latest | Compile generated UI code |
-| **API Parsing** | @apidevtools/swagger-parser | 10.x | OpenAPI/Swagger validation |
-| **API Conversion** | swagger2openapi | 7.x | Swagger 2.0 → OpenAPI 3.x |
-| **GraphQL** | graphql | 16.x | GraphQL schema parsing |
-| **Database** | better-sqlite3 | latest | Version history metadata |
-| **Credentials** | keytar | 7.x | OS keychain integration |
-| **Diff** | diff-match-patch | latest | Version comparison |
-| **Testing** | Vitest | latest | Unit and integration tests |
-| **Component Testing** | React Testing Library | latest | Component behavior tests |
-| **E2E Testing** | Playwright | latest | End-to-end tests |
-| **Accessibility** | axe-core | latest | Automated a11y audits |
-| **Linting** | ESLint | 9.x | Code quality enforcement |
-| **Formatting** | Prettier | latest | Code formatting |
-| **Pre-commit** | husky + lint-staged | latest | Local verification gate |
+| Category              | Technology                  | Version      | Purpose                               |
+| --------------------- | --------------------------- | ------------ | ------------------------------------- |
+| **Runtime**           | Electron                    | 34.x         | Desktop shell, IPC, window management |
+| **Language**          | TypeScript                  | 5.x (strict) | Type-safe development                 |
+| **UI Framework**      | React                       | 19.x         | Component-based UI                    |
+| **State Management**  | Zustand                     | 5.x          | Lightweight, hook-based stores        |
+| **Styling**           | Tailwind CSS                | 4.x          | Utility-first CSS with design tokens  |
+| **UI Primitives**     | Radix UI                    | latest       | Accessible component primitives       |
+| **Icons**             | lucide-react                | latest       | Consistent icon set                   |
+| **Layout**            | react-resizable-panels      | latest       | Accessible split panes                |
+| **Virtualization**    | @tanstack/virtual           | latest       | Performant list rendering             |
+| **Bundler**           | Vite + electron-vite        | latest       | Fast dev/build for Electron           |
+| **In-app Bundler**    | esbuild                     | latest       | Compile generated UI code             |
+| **API Parsing**       | @apidevtools/swagger-parser | 10.x         | OpenAPI/Swagger validation            |
+| **API Conversion**    | swagger2openapi             | 7.x          | Swagger 2.0 → OpenAPI 3.x             |
+| **GraphQL**           | graphql                     | 16.x         | GraphQL schema parsing                |
+| **Database**          | better-sqlite3              | latest       | Version history metadata              |
+| **Credentials**       | keytar                      | 7.x          | OS keychain integration               |
+| **Diff**              | diff-match-patch            | latest       | Version comparison                    |
+| **Testing**           | Vitest                      | latest       | Unit and integration tests            |
+| **Component Testing** | React Testing Library       | latest       | Component behavior tests              |
+| **E2E Testing**       | Playwright                  | latest       | End-to-end tests                      |
+| **Accessibility**     | axe-core                    | latest       | Automated a11y audits                 |
+| **Linting**           | ESLint                      | 9.x          | Code quality enforcement              |
+| **Formatting**        | Prettier                    | latest       | Code formatting                       |
+| **Pre-commit**        | husky + lint-staged         | latest       | Local verification gate               |
 
 ---
 
@@ -148,6 +148,7 @@ tests/
 ## Key Conventions
 
 ### Code Style
+
 - **TypeScript strict mode**: No `any` without justification comment
 - **File size**: Max 300 lines per file; refactor if exceeded
 - **Naming**: PascalCase for components/types, camelCase for functions/variables, kebab-case for files
@@ -155,6 +156,7 @@ tests/
 - **Exports**: Named exports only (no default exports except page-level components)
 
 ### Component Patterns
+
 - Use Radix UI primitives for all interactive elements
 - Use CSS Modules or Tailwind utilities (no inline styles)
 - Every component must handle: loading, error, empty states
@@ -162,18 +164,21 @@ tests/
 - Use `React.memo` only when profiling shows measurable re-render cost
 
 ### State Management
+
 - **Zustand stores** for cross-component state (tabs, auth, CLI status, versions, plugins)
 - **Local state** (`useState`) for component-internal UI state
 - **Store selectors** for granular subscriptions (avoid full-store subscriptions)
 - No Redux, no Context for global state
 
 ### Testing
+
 - **Test-first** (Red-Green-Refactor) is the preferred workflow
 - Tests must be deterministic: mock all external deps, use fake timers
 - File naming: `*.test.ts` or `*.test.tsx` co-located with source
 - Coverage target: ≥80% per feature branch
 
 ### Commit Messages
+
 ```text
 feat: add chat panel component with message history
 fix: resolve tab close confirmation not appearing
@@ -188,27 +193,27 @@ chore: configure husky pre-commit hooks
 
 ## Architecture Decisions
 
-| Decision | Choice | Key Rationale |
-|----------|--------|---------------|
-| Desktop platform | Electron 34 | Full filesystem + OS keychain access; subprocess management |
-| UI isolation | Sandboxed iframe | Security boundary for generated code; no parent window access |
-| CLI communication | stdin/stdout JSON-RPC 2.0 | Industry standard (LSP/MCP); streaming support |
-| State management | Zustand | Minimal boilerplate; built-in selectors; no provider wrapping |
-| Spec parsing | swagger-parser + graphql | Best-in-class for each format; unified NormalizedSpec output |
-| Version storage | SQLite + filesystem | Fast metadata queries; no DB bloat from large code snapshots |
-| Credential storage | keytar (OS keychain) | Native OS security (DPAPI, Keychain, libsecret) |
-| Code compilation | esbuild (main process) | Fast; runs off renderer thread; no WASM overhead |
-| Component library | Radix UI | WCAG 2.1 AA out of the box; 24+ primitives |
+| Decision           | Choice                    | Key Rationale                                                 |
+| ------------------ | ------------------------- | ------------------------------------------------------------- |
+| Desktop platform   | Electron 34               | Full filesystem + OS keychain access; subprocess management   |
+| UI isolation       | Sandboxed iframe          | Security boundary for generated code; no parent window access |
+| CLI communication  | stdin/stdout JSON-RPC 2.0 | Industry standard (LSP/MCP); streaming support                |
+| State management   | Zustand                   | Minimal boilerplate; built-in selectors; no provider wrapping |
+| Spec parsing       | swagger-parser + graphql  | Best-in-class for each format; unified NormalizedSpec output  |
+| Version storage    | SQLite + filesystem       | Fast metadata queries; no DB bloat from large code snapshots  |
+| Credential storage | keytar (OS keychain)      | Native OS security (DPAPI, Keychain, libsecret)               |
+| Code compilation   | esbuild (main process)    | Fast; runs off renderer thread; no WASM overhead              |
+| Component library  | Radix UI                  | WCAG 2.1 AA out of the box; 24+ primitives                    |
 
 ---
 
 ## Design Contracts Reference
 
-| Contract | File | Boundary |
-|----------|------|----------|
-| Sandbox PostMessage API | `contracts/sandbox-postmessage-api.md` | Host renderer ↔ Sandbox iframe |
-| Electron IPC Channels | `contracts/electron-ipc-channels.md` | Main process ↔ Renderer |
-| CLI Protocol | `contracts/cli-protocol.md` | Main process ↔ Copilot CLI subprocess |
+| Contract                | File                                   | Boundary                              |
+| ----------------------- | -------------------------------------- | ------------------------------------- |
+| Sandbox PostMessage API | `contracts/sandbox-postmessage-api.md` | Host renderer ↔ Sandbox iframe        |
+| Electron IPC Channels   | `contracts/electron-ipc-channels.md`   | Main process ↔ Renderer               |
+| CLI Protocol            | `contracts/cli-protocol.md`            | Main process ↔ Copilot CLI subprocess |
 
 ---
 

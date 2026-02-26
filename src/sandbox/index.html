@@ -1,0 +1,21 @@
+<!doctype html>
+<!-- src/sandbox/index.html -->
+<!-- Sandbox iframe shell: minimal HTML document served inside the sandboxed iframe. -->
+<!-- Uses a strict Content Security Policy (CSP) to isolate generated UI code.       -->
+<!--                                                                                   -->
+<!-- IMPORTANT: The 'nonce-PLACEHOLDER' MUST be replaced with a unique,               -->
+<!-- cryptographically-random nonce on every page load before serving this document.  -->
+<!-- Static/reused nonces defeat XSS protection. Full nonce injection is in T037.     -->
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'none'; script-src 'nonce-PLACEHOLDER'; style-src 'nonce-PLACEHOLDER'; connect-src 'self'; frame-ancestors 'none'"
+    />
+    <title>Sandbox</title>
+  </head>
+  <body>
+    <div id="sandbox-root"></div>
+  </body>
+</html>
