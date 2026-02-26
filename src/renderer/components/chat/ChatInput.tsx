@@ -17,6 +17,8 @@ import {
 interface ChatInputProps {
   onSend: (text: string, attachment?: File) => void;
   disabled?: boolean;
+  isCustomizing?: boolean;
+  queueDepth?: number;
 }
 
 // ─── Constants ────────────────────────────────────────────────────────────────
@@ -81,14 +83,20 @@ function AttachmentBadge({ file, onRemove }: AttachmentBadgeProps): JSX.Element 
 
 // ─── Component ────────────────────────────────────────────────────────────────
 
-export function ChatInput({ onSend, disabled = false }: ChatInputProps): JSX.Element {
+export function ChatInput({
+  onSend,
+  disabled = false,
+  isCustomizing = false,
+  queueDepth = 0,
+}: ChatInputProps): JSX.Element {
   const [text, setText] = useState('');
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [isDraggingOver, setIsDraggingOver] = useState(false);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const canSend = !disabled && (text.trim().length > 0 || selectedFile !== null);
+  const effectivelyDisabled = disabled || isCustomizing;
+  const canSend = !effectivelyDisabled && (text.trim().length > 0 || selectedFile !== null);
 
   const clearState = useCallback(() => {
     setText('');
@@ -193,7 +201,7 @@ export function ChatInput({ onSend, disabled = false }: ChatInputProps): JSX.Ele
         <button
           type="button"
           aria-label="Attach a spec file (.json, .yaml, .graphql)"
-          disabled={disabled}
+          disabled={effectivelyDisabled}
           onClick={() => fileInputRef.current?.click()}
           style={{
             flexShrink: 0,
@@ -205,9 +213,9 @@ export function ChatInput({ onSend, disabled = false }: ChatInputProps): JSX.Ele
             background: 'none',
             border: '1px solid var(--color-border-default)',
             borderRadius: 'var(--radius-md)',
-            cursor: disabled ? 'not-allowed' : 'pointer',
+            cursor: effectivelyDisabled ? 'not-allowed' : 'pointer',
             color: 'var(--color-text-secondary)',
-            opacity: disabled ? 0.5 : 1,
+            opacity: effectivelyDisabled ? 0.5 : 1,
             fontSize: 'var(--text-base)',
           }}
         >
@@ -220,8 +228,12 @@ export function ChatInput({ onSend, disabled = false }: ChatInputProps): JSX.Ele
           onChange={(e) => setText(e.target.value)}
           onKeyDown={handleKeyDown}
           onPaste={handlePaste}
-          disabled={disabled}
-          placeholder="Type a message or paste a URL… (Enter to send, Shift+Enter for newline)"
+          disabled={effectivelyDisabled}
+          placeholder={
+            isCustomizing
+              ? 'Customizing…'
+              : 'Type a message or paste a URL… (Enter to send, Shift+Enter for newline)'
+          }
           rows={3}
           aria-label="Message input"
           aria-multiline="true"
@@ -237,21 +249,41 @@ export function ChatInput({ onSend, disabled = false }: ChatInputProps): JSX.Ele
             fontFamily: 'var(--font-sans)',
             lineHeight: '1.5',
             outline: 'none',
-            cursor: disabled ? 'not-allowed' : 'auto',
-            opacity: disabled ? 0.6 : 1,
+            cursor: effectivelyDisabled ? 'not-allowed' : 'auto',
+            opacity: effectivelyDisabled ? 0.6 : 1,
           }}
         />
+
+        {/* Queue depth badge */}
+        {queueDepth > 0 && (
+          <span
+            aria-label={`${queueDepth} customization(s) queued`}
+            style={{
+              flexShrink: 0,
+              padding: '2px var(--spacing-2)',
+              background: 'var(--color-surface-raised)',
+              border: '1px solid var(--color-border-default)',
+              borderRadius: 'var(--radius-full)',
+              fontSize: 'var(--text-xs)',
+              color: 'var(--color-text-secondary)',
+              whiteSpace: 'nowrap',
+            }}
+          >
+            Queued: {queueDepth}
+          </span>
+        )}
 
         {/* Send button */}
         <button
           type="button"
-          aria-label="Send message"
+          aria-label={isCustomizing ? 'Customizing…' : 'Send message'}
           disabled={!canSend}
           onClick={handleSend}
           style={{
             flexShrink: 0,
-            width: 32,
+            width: isCustomizing ? 'auto' : 32,
             height: 32,
+            padding: isCustomizing ? '0 var(--spacing-2)' : '0',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
@@ -264,7 +296,7 @@ export function ChatInput({ onSend, disabled = false }: ChatInputProps): JSX.Ele
             transition: 'background 0.15s ease',
           }}
         >
-          ➤
+          {isCustomizing ? 'Customizing…' : '➤'}
         </button>
       </div>
     </div>

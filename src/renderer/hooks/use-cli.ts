@@ -15,6 +15,22 @@ interface SendMessageContext {
   activeVersionId?: string;
 }
 
+interface CustomizeParams {
+  tabId: string;
+  prompt: string;
+  currentCode: string;
+  specContext: string;
+  chatHistory: Array<{ role: string; content: string }>;
+  onChunk?: (chunk: string, done: boolean) => void;
+}
+
+export interface CustomizeResult {
+  code?: string;
+  clarificationNeeded?: boolean;
+  question?: string;
+  options?: string[];
+}
+
 interface StreamResponseEvent {
   requestId: string;
   chunk: string;
@@ -42,6 +58,12 @@ interface UseCliReturn extends UseCliState {
     context?: SendMessageContext,
     onChunk?: (chunk: string, done: boolean) => void,
   ): Promise<string>;
+
+  /**
+   * Send a customization request to the CLI.
+   * Handles clarification responses by returning a shaped result.
+   */
+  customize(params: CustomizeParams): Promise<CustomizeResult>;
 
   /** Fetch the current CLI status from the main process. */
   getStatus(): Promise<CLIState>;
@@ -137,6 +159,30 @@ export function useCli(): UseCliReturn {
     [],
   );
 
+  // ── customize ────────────────────────────────────────────────────────────
+
+  const customize = useCallback(
+    async (params: CustomizeParams): Promise<CustomizeResult> => {
+      const message = JSON.stringify({ method: 'customize', ...params });
+      const response = await sendMessage(message, { tabId: params.tabId }, params.onChunk);
+      try {
+        const parsed = JSON.parse(response) as Record<string, unknown>;
+        if (parsed.clarificationNeeded === true) {
+          return {
+            clarificationNeeded: true,
+            question: String(parsed.question ?? ''),
+            options: Array.isArray(parsed.options) ? (parsed.options as string[]) : [],
+          };
+        }
+        return { code: String(parsed.code ?? response) };
+      } catch {
+        // If response is not JSON, treat as raw code
+        return { code: response };
+      }
+    },
+    [sendMessage],
+  );
+
   // ── getStatus ────────────────────────────────────────────────────────────
 
   const getStatus = useCallback(async (): Promise<CLIState> => {
@@ -181,5 +227,5 @@ export function useCli(): UseCliReturn {
     }
   }, []);
 
-  return { isLoading, error, streamingContent, sendMessage, getStatus, restart };
+  return { isLoading, error, streamingContent, sendMessage, customize, getStatus, restart };
 }

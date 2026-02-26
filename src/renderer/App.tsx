@@ -1,8 +1,7 @@
 // src/renderer/App.tsx
-// T041 — Full application shell with split-pane layout.
-// Left pane (30%): ChatPanel + ChatInput
-// Right pane (70%): SandboxHost
-// Wires the full flow: chat input → spec detection → parse → generate → sandbox render.
+// T041/T063/T074 — Application shell with customization and version history.
+// Left pane: ChatPanel + ChatInput + VersionTimeline (collapsible)
+// Right pane: SandboxHost
 import type { JSX } from 'react';
 import { useCallback, useState } from 'react';
 import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels';
@@ -12,10 +11,14 @@ import { ProgressBar, EmptyState } from './components/common';
 import { ChatPanel } from './components/chat/ChatPanel';
 import { ChatInput } from './components/chat/ChatInput';
 import { SandboxHost } from './components/sandbox/SandboxHost';
+import { VersionTimeline } from './components/versions/VersionTimeline';
 import { useAppStore } from './stores/app-store';
 import { useTabStore } from './stores/tab-store';
 import { detectFormat, parseSpec } from './services/spec-parser/spec-parser';
 import { generateInterface } from './services/code-generator';
+import { useCli } from './hooks/use-cli';
+import { useCustomization } from './hooks/use-customization';
+import { useVersions } from './hooks/use-versions';
 import type { ChatMessage } from '../shared/types';
 import { MIN_CHAT_PANEL_WIDTH_PERCENT, MAX_CHAT_PANEL_WIDTH_PERCENT } from '../shared/constants';
 
@@ -26,10 +29,16 @@ export default function App(): JSX.Element {
   const { tab, addChatMessage, loadSpec, startGenerating, finishGenerating } = useTabStore();
 
   const [compiledCode, setCompiledCode] = useState<string | null>(null);
-  const [progress, setProgress] = useState<number>(0);
-  const [progressLabel, setProgressLabel] = useState<string>('');
+  const [rawCode, setRawCode] = useState<string | null>(null);
+  const [progress, setProgress] = useState(0);
+  const [progressLabel, setProgressLabel] = useState('');
   const [sandboxError, setSandboxError] = useState<string | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
+  const [showVersions, setShowVersions] = useState(false);
+
+  const cli = useCli();
+  const customization = useCustomization();
+  const versions = useVersions(tab.id, tab.id);
 
   // ── Helpers ────────────────────────────────────────────────────────────────
 
@@ -50,25 +59,80 @@ export default function App(): JSX.Element {
     [tab.id, addChatMessage],
   );
 
-  // ── Send handler ────────────────────────────────────────────────────────────
+  // ── Apply new code (compile + validate + update sandbox) ───────────────────
 
-  const handleSend = useCallback(
+  const applyCode = useCallback(
+    async (newRawCode: string): Promise<boolean> => {
+      const compileResult = await window.experienceUI.app.compileCode({
+        sourceCode: newRawCode,
+        format: 'iife',
+        target: 'es2020',
+        minify: false,
+      });
+      if (!compileResult.success) {
+        appendMessage(
+          'system',
+          `Compile error: ${compileResult.errors?.[0]?.message ?? 'Unknown'}`,
+        );
+        return false;
+      }
+      const validateResult = await window.experienceUI.app.validateCode({
+        code: compileResult.compiledCode ?? '',
+      });
+      if (!validateResult.valid) {
+        appendMessage('system', 'Validation failed: code contains disallowed patterns.');
+        return false;
+      }
+      setRawCode(newRawCode);
+      setCompiledCode(compileResult.compiledCode ?? null);
+      return true;
+    },
+    [appendMessage],
+  );
+
+  // ── Customization path ────────────────────────────────────────────────────
+
+  const handleCustomize = useCallback(
+    async (text: string) => {
+      appendMessage('user', text);
+      const chatHistory = tab.chatHistory.map((m) => ({ role: m.role, content: m.content }));
+      const specContext = JSON.stringify(tab.apiSpec?.normalizedSpec ?? {});
+
+      await customization.runCustomization(
+        tab.id,
+        text,
+        rawCode ?? '',
+        specContext,
+        chatHistory,
+        cli.customize,
+        async (newCode) => {
+          const applied = await applyCode(newCode);
+          if (applied) {
+            appendMessage('assistant', 'Customization applied successfully.');
+            await versions
+              .saveSnapshot(newCode, text.slice(0, 80), 'customization')
+              .catch(() => undefined);
+          }
+        },
+        (errMsg) => appendMessage('system', `Customization error: ${errMsg}`),
+      );
+    },
+    [tab, rawCode, cli.customize, customization, appendMessage, applyCode, versions],
+  );
+
+  // ── Spec loading + initial generation ─────────────────────────────────────
+
+  const handleLoad = useCallback(
     async (text: string, attachment?: File) => {
-      if (isProcessing) return;
       setIsProcessing(true);
       setSandboxError(null);
-
-      // Record the user message
       appendMessage('user', text.trim() || (attachment ? `Attached: ${attachment.name}` : ''));
 
       try {
         let rawContent: string;
-
-        // ── Step 1: Get spec content ─────────────────────────────────────────
         if (attachment) {
           rawContent = await attachment.text();
         } else if (text.startsWith('http://') || text.startsWith('https://')) {
-          // Validate the URL is well-formed before fetching.
           let parsedUrl: URL;
           try {
             parsedUrl = new URL(text);
@@ -76,7 +140,6 @@ export default function App(): JSX.Element {
             appendMessage('system', 'Error: Invalid URL — please provide a valid http(s) URL.');
             return;
           }
-          // Only allow http/https schemes (block file://, data:, etc.).
           if (parsedUrl.protocol !== 'http:' && parsedUrl.protocol !== 'https:') {
             appendMessage('system', 'Error: Only http:// and https:// URLs are supported.');
             return;
@@ -89,16 +152,16 @@ export default function App(): JSX.Element {
           rawContent = text;
         }
 
-        // ── Step 2: Parse spec ───────────────────────────────────────────────
         setProgressLabel('Parsing spec…');
         setProgress(25);
         const format = detectFormat(rawContent);
         const parseResult = await parseSpec(rawContent, format);
 
         if (!parseResult.success || !parseResult.spec) {
-          const errMsg =
-            parseResult.validationErrors[0]?.message ?? 'Failed to parse the API spec.';
-          appendMessage('system', `Error: ${errMsg}`);
+          appendMessage(
+            'system',
+            `Error: ${parseResult.validationErrors[0]?.message ?? 'Failed to parse the API spec.'}`,
+          );
           return;
         }
 
@@ -125,34 +188,73 @@ export default function App(): JSX.Element {
 
         appendMessage('system', `Loaded: ${parseResult.spec.metadata.title}`);
 
-        // ── Step 3: Generate interface ───────────────────────────────────────
         setProgressLabel('Generating interface…');
         setProgress(50);
         startGenerating();
 
         const genResult = await generateInterface(parseResult.spec);
-
         if (!genResult.success) {
           appendMessage('system', `Generation failed: ${genResult.error}`);
           return;
         }
 
         setProgress(90);
+        setRawCode(genResult.rawCode);
         setCompiledCode(genResult.compiledCode);
         finishGenerating();
         setProgress(100);
         appendMessage('assistant', 'Interface generated successfully. Preview is ready.');
+        await versions
+          .saveSnapshot(
+            genResult.rawCode,
+            `Generated from ${parseResult.spec.metadata.title}`,
+            'generation',
+          )
+          .catch(() => undefined);
       } catch (err) {
-        const msg = err instanceof Error ? err.message : String(err);
-        appendMessage('system', `Error: ${msg}`);
+        appendMessage('system', `Error: ${err instanceof Error ? err.message : String(err)}`);
       } finally {
         setIsProcessing(false);
         setProgressLabel('');
         setProgress(0);
       }
     },
-    [isProcessing, appendMessage, loadSpec, startGenerating, finishGenerating],
+    [appendMessage, loadSpec, startGenerating, finishGenerating, versions],
   );
+
+  // ── Rollback ──────────────────────────────────────────────────────────────
+
+  const handleRollback = useCallback(
+    async (versionId: string) => {
+      try {
+        const { code } = await versions.rollback(versionId);
+        const applied = await applyCode(code);
+        if (applied) appendMessage('assistant', 'Rolled back to previous version.');
+      } catch (err) {
+        appendMessage(
+          'system',
+          `Rollback failed: ${err instanceof Error ? err.message : String(err)}`,
+        );
+      }
+    },
+    [versions, applyCode, appendMessage],
+  );
+
+  // ── Unified send handler ───────────────────────────────────────────────────
+
+  const handleSend = useCallback(
+    async (text: string, attachment?: File) => {
+      if (isProcessing || customization.isCustomizing) return;
+      if (tab.apiSpec && !attachment) {
+        await handleCustomize(text);
+      } else {
+        await handleLoad(text, attachment);
+      }
+    },
+    [isProcessing, customization.isCustomizing, tab.apiSpec, handleCustomize, handleLoad],
+  );
+
+  const pendingCount = customization.queueDepth;
 
   return (
     <div
@@ -170,7 +272,6 @@ export default function App(): JSX.Element {
       }}
     >
       <TooltipProvider>
-        {/* Progress bar */}
         {isProcessing && (
           <div style={{ position: 'fixed', top: 0, left: 0, right: 0, zIndex: 100 }}>
             <ProgressBar value={progress} label={progressLabel} />
@@ -178,15 +279,59 @@ export default function App(): JSX.Element {
         )}
 
         <PanelGroup direction="horizontal" style={{ flex: 1, minHeight: 0 }}>
-          {/* Left pane: Chat */}
           <Panel
             defaultSize={30}
             minSize={MIN_CHAT_PANEL_WIDTH_PERCENT}
             maxSize={MAX_CHAT_PANEL_WIDTH_PERCENT}
             style={{ display: 'flex', flexDirection: 'column', overflow: 'hidden' }}
           >
-            <ChatPanel messages={tab.chatHistory} isGenerating={isProcessing} />
-            <ChatInput onSend={(t, f) => void handleSend(t, f)} disabled={isProcessing} />
+            <ChatPanel
+              messages={tab.chatHistory}
+              isGenerating={isProcessing}
+              pendingCount={pendingCount}
+              clarification={customization.clarification ?? undefined}
+            />
+            <ChatInput
+              onSend={(t, f) => void handleSend(t, f)}
+              disabled={isProcessing}
+              isCustomizing={customization.isCustomizing}
+              queueDepth={customization.queueDepth}
+            />
+            {/* Version history toggle */}
+            {compiledCode && (
+              <button
+                type="button"
+                onClick={() => setShowVersions((v) => !v)}
+                style={{
+                  padding: 'var(--spacing-2)',
+                  fontSize: 'var(--text-xs)',
+                  background: 'var(--color-surface-raised)',
+                  border: 'none',
+                  borderTop: '1px solid var(--color-border-default)',
+                  cursor: 'pointer',
+                  color: 'var(--color-text-secondary)',
+                }}
+                aria-label="Toggle version history"
+              >
+                {showVersions ? '▲ Hide' : '▼ Show'} Version History ({versions.versions.length})
+              </button>
+            )}
+            {showVersions && (
+              <div
+                style={{
+                  maxHeight: 220,
+                  overflow: 'hidden',
+                  borderTop: '1px solid var(--color-border-default)',
+                }}
+              >
+                <VersionTimeline
+                  versions={versions.versions}
+                  currentVersionId={versions.currentVersionId}
+                  onRollback={(id) => void handleRollback(id)}
+                  onLoad={(id) => void versions.loadVersion(id).then(applyCode)}
+                />
+              </div>
+            )}
           </Panel>
 
           <PanelResizeHandle
@@ -198,7 +343,6 @@ export default function App(): JSX.Element {
             }}
           />
 
-          {/* Right pane: Sandbox preview */}
           <Panel style={{ overflow: 'hidden' }}>
             {compiledCode ? (
               <SandboxHost

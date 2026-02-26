@@ -7,13 +7,22 @@ import { useVirtualizer } from '@tanstack/react-virtual';
 
 import type { ChatMessage as ChatMessageType } from '../../../shared/types';
 import { ChatMessage } from './ChatMessage';
+import { ClarificationCard } from './ClarificationCard';
 import { LoadingSpinner } from '../common';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
+interface ClarificationState {
+  question: string;
+  options: string[];
+  onSelect: (option: string) => void;
+}
+
 interface ChatPanelProps {
   messages: ChatMessageType[];
   isGenerating?: boolean;
+  pendingCount?: number;
+  clarification?: ClarificationState;
 }
 
 // ─── Empty State ──────────────────────────────────────────────────────────────
@@ -42,7 +51,12 @@ function EmptyConversation(): JSX.Element {
 
 // ─── Component ────────────────────────────────────────────────────────────────
 
-export function ChatPanel({ messages, isGenerating = false }: ChatPanelProps): JSX.Element {
+export function ChatPanel({
+  messages,
+  isGenerating = false,
+  pendingCount = 0,
+  clarification,
+}: ChatPanelProps): JSX.Element {
   const parentRef = useRef<HTMLDivElement>(null);
 
   const virtualizer = useVirtualizer({
@@ -122,6 +136,32 @@ export function ChatPanel({ messages, isGenerating = false }: ChatPanelProps): J
         >
           <LoadingSpinner size="sm" label="Generating response" />
           <span>Generating…</span>
+        </div>
+      )}
+
+      {/* Clarification card */}
+      {clarification && (
+        <ClarificationCard
+          question={clarification.question}
+          options={clarification.options}
+          onSelect={clarification.onSelect}
+        />
+      )}
+
+      {/* Queued requests banner */}
+      {pendingCount > 0 && (
+        <div
+          role="status"
+          aria-label={`${pendingCount} request(s) queued`}
+          style={{
+            padding: 'var(--spacing-2) var(--spacing-4)',
+            borderTop: '1px solid var(--color-border-subtle)',
+            background: 'var(--color-surface-raised)',
+            color: 'var(--color-text-secondary)',
+            fontSize: 'var(--text-xs)',
+          }}
+        >
+          ⏳ {pendingCount} request{pendingCount === 1 ? '' : 's'} queued
         </div>
       )}
     </div>

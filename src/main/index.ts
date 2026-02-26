@@ -46,6 +46,8 @@ import type { CLIState } from '../shared/types';
 import { credentialStore } from './credentials/credential-store';
 import { OAuthFlow } from './credentials/oauth-flow';
 import { registerApiProxy } from './proxy/api-proxy';
+import { VersionDB } from './versions/version-db';
+import { registerVersionHandlers } from './versions/version-handlers';
 
 // Prevent multiple instances of the app
 const gotTheLock = app.requestSingleInstanceLock();
@@ -54,6 +56,11 @@ if (!gotTheLock) {
 }
 
 let mainWindow: BrowserWindow | null = null;
+
+// ─── VersionDB Singleton ──────────────────────────────────────────────────────
+
+// Initialized in app.whenReady() once userData path is available
+let versionDb: VersionDB | null = null;
 
 // ─── CLI Manager Singleton ────────────────────────────────────────────────────
 
@@ -291,6 +298,11 @@ function createWindow(): BrowserWindow {
 
 // App lifecycle
 app.whenReady().then(() => {
+  // ── T068: Initialize VersionDB ──────────────────────────────────────────────
+  const userDataPath = app.getPath('userData');
+  versionDb = new VersionDB(join(userDataPath, 'versions.db'));
+  registerVersionHandlers(versionDb, userDataPath);
+
   registerIpcHandlers();
   mainWindow = createWindow();
 
