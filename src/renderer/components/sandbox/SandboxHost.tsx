@@ -1,11 +1,13 @@
 // src/renderer/components/sandbox/SandboxHost.tsx
-// T038 — Sandboxed iframe host component.
+// T038 + T054 — Sandboxed iframe host component.
 // Manages iframe lifecycle: CSP shell generation, INIT handshake, error recovery,
 // and network request proxying via the main-process API bridge.
+// T054: handles unauthenticated state and expired-token overlay.
 
 import { type JSX, useCallback, useEffect, useRef, useState } from 'react';
 
 import { SANDBOX_CSP_TEMPLATE } from '../../../shared/constants';
+import { useAuth } from '../../hooks/use-auth';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -14,6 +16,8 @@ interface SandboxHostProps {
   theme: 'light' | 'dark';
   onReady?: () => void;
   onError?: (err: string) => void;
+  /** Optional baseUrl whose auth status controls the overlay. */
+  authBaseUrl?: string;
 }
 
 interface SandboxReadyPayload {
@@ -74,6 +78,7 @@ export function SandboxHost({
   theme,
   onReady,
   onError,
+  authBaseUrl,
 }: SandboxHostProps): JSX.Element {
   const iframeRef = useRef<HTMLIFrameElement>(null);
 
@@ -84,6 +89,14 @@ export function SandboxHost({
 
   // Preserve the last successfully initialized code for fatal-error recovery.
   const lastSafeCodeRef = useRef<string | null>(null);
+
+  // Auth state
+  const { getStatus } = useAuth();
+  const authStatus = authBaseUrl ? getStatus(authBaseUrl) : null;
+  const isExpired = authStatus === 'expired';
+  /** No compiled code yet AND an auth URL is set but the user hasn't authenticated yet. */
+  const showUnauthenticatedPlaceholder =
+    !compiledCode && authBaseUrl !== undefined && authStatus === 'disconnected';
 
   // ── Update iframe content when compiledCode changes ────────────────────────
   useEffect(() => {
@@ -225,6 +238,63 @@ export function SandboxHost({
       style={{ width: '100%', height: '100%', position: 'relative' }}
       aria-label="Generated UI preview"
     >
+      {/* Unauthenticated placeholder: no code AND auth is configured but disconnected */}
+      {showUnauthenticatedPlaceholder && (
+        <div
+          role="status"
+          aria-label="Authentication required"
+          style={{
+            position: 'absolute',
+            inset: 0,
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            background: 'var(--color-bg-primary)',
+            color: 'var(--color-text-secondary)',
+            gap: 'var(--spacing-3)',
+            zIndex: 2,
+          }}
+        >
+          <span style={{ fontSize: '2rem' }} aria-hidden="true">
+            🔐
+          </span>
+          <p style={{ margin: 0, fontSize: 'var(--text-sm)' }}>
+            Configure authentication to see live data
+          </p>
+        </div>
+      )}
+
+      {/* Expired-token overlay: sits on top of iframe WITHOUT destroying it */}
+      {isExpired && (
+        <div
+          role="alert"
+          aria-label="Token expired — re-authentication required"
+          style={{
+            position: 'absolute',
+            inset: 0,
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            background: 'rgba(0,0,0,0.6)',
+            color: '#fff',
+            gap: 'var(--spacing-3)',
+            zIndex: 3,
+          }}
+        >
+          <span style={{ fontSize: '2rem' }} aria-hidden="true">
+            ⏰
+          </span>
+          <p style={{ margin: 0, fontSize: 'var(--text-base)', fontWeight: 600 }}>
+            Session expired
+          </p>
+          <p style={{ margin: 0, fontSize: 'var(--text-sm)', opacity: 0.85 }}>
+            Your credentials have expired. Please re-authenticate to continue.
+          </p>
+        </div>
+      )}
+
       {!isReady && compiledCode && (
         <div
           style={{

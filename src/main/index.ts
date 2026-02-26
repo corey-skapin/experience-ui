@@ -17,22 +17,35 @@ import {
   IPC_APP_COMPILE_CODE,
   IPC_APP_GET_VERSION,
   IPC_APP_VALIDATE_CODE,
+  IPC_AUTH_CLEAR_CREDENTIALS,
+  IPC_AUTH_CONFIGURE,
+  IPC_AUTH_GET_CONNECTION_STATUS,
+  IPC_AUTH_START_OAUTH_FLOW,
+  IPC_AUTH_TEST_CONNECTION,
   IPC_CLI_GET_STATUS,
   IPC_CLI_RESTART,
   IPC_CLI_SEND_MESSAGE,
   IPC_CLI_STATUS_CHANGED,
   IPC_CLI_STREAM_RESPONSE,
 } from '../shared/ipc-channels';
-import { DISALLOWED_CODE_PATTERNS } from '../shared/constants';
+import { DISALLOWED_CODE_PATTERNS, HEALTH_CHECK_TIMEOUT_MS } from '../shared/constants';
 import type {
+  AuthConfigureRequest,
+  AuthClearRequest,
+  AuthStatusRequest,
+  AuthTestRequest,
   CLISendMessageRequest,
   CLIStatusChangedEvent,
   CLIStreamResponseEvent,
   CompileCodeRequest,
+  OAuthFlowRequest,
   ValidateCodeRequest,
 } from './preload-types';
 import { CLIManager, type StreamChunkEvent } from './cli/cli-manager';
 import type { CLIState } from '../shared/types';
+import { credentialStore } from './credentials/credential-store';
+import { OAuthFlow } from './credentials/oauth-flow';
+import { registerApiProxy } from './proxy/api-proxy';
 
 // Prevent multiple instances of the app
 const gotTheLock = app.requestSingleInstanceLock();
@@ -95,6 +108,99 @@ function registerIpcHandlers(): void {
       return { success: false, error: err instanceof Error ? err.message : String(err) };
     }
   });
+
+  // ── T047: Auth Domain ──────────────────────────────────────────────────────
+
+  const oauthFlow = new OAuthFlow(credentialStore);
+
+  ipcMain.handle(IPC_AUTH_CONFIGURE, async (_event, req: AuthConfigureRequest) => {
+    try {
+      const method = req.method;
+      // OAuth2 setup must go through the interactive flow — not stored as raw creds
+      if (method.type === 'oauth2') {
+        return oauthFlow.startFlow({
+          baseUrl: req.baseUrl,
+          clientId: method.clientId,
+          authEndpoint: method.authEndpoint,
+          tokenEndpoint: method.tokenEndpoint,
+          scopes: method.scopes,
+        });
+      }
+      // apiKey and bearer can be stored directly
+      credentialStore.set(req.baseUrl, method, { persist: req.persist });
+      const ref = credentialStore.get(req.baseUrl);
+      return { success: true, connectionId: ref?.connectionId ?? '' };
+    } catch (err) {
+      return {
+        success: false,
+        connectionId: '',
+        error: err instanceof Error ? err.message : String(err),
+      };
+    }
+  });
+
+  ipcMain.handle(IPC_AUTH_TEST_CONNECTION, async (_event, req: AuthTestRequest) => {
+    const healthPath = req.healthCheckPath ?? '/';
+    const url = `${req.baseUrl}${healthPath}`;
+    const start = Date.now();
+    try {
+      const raw = credentialStore.getRaw(req.baseUrl);
+      const headers: Record<string, string> = {};
+      if (raw?.type === 'apiKey') headers[raw.headerName] = raw.key;
+      else if (raw?.type === 'bearer') headers['Authorization'] = `Bearer ${raw.token}`;
+      else if (raw?.type === 'oauth2') headers['Authorization'] = `Bearer ${raw.accessToken}`;
+
+      const res = await fetch(url, {
+        method: 'GET',
+        headers,
+        signal: AbortSignal.timeout(HEALTH_CHECK_TIMEOUT_MS),
+      });
+      const responseTimeMs = Date.now() - start;
+
+      if (res.status === 401)
+        return { status: 'unauthorized', responseTimeMs, statusCode: res.status };
+      if (res.ok) return { status: 'connected', responseTimeMs, statusCode: res.status };
+      return { status: 'degraded', responseTimeMs, statusCode: res.status };
+    } catch (err) {
+      return {
+        status: 'unreachable',
+        responseTimeMs: Date.now() - start,
+        error: err instanceof Error ? err.message : String(err),
+      };
+    }
+  });
+
+  ipcMain.handle(IPC_AUTH_GET_CONNECTION_STATUS, (_event, req: AuthStatusRequest) => {
+    const raw = credentialStore.getRaw(req.baseUrl);
+    if (!raw)
+      return {
+        configured: false,
+        status: 'disconnected',
+        authMethod: 'none',
+        lastVerifiedAt: null,
+        responseTimeMs: null,
+      };
+    return {
+      configured: true,
+      status: 'connected',
+      authMethod: raw.type,
+      lastVerifiedAt: null,
+      responseTimeMs: null,
+    };
+  });
+
+  ipcMain.handle(IPC_AUTH_CLEAR_CREDENTIALS, async (_event, req: AuthClearRequest) => {
+    credentialStore.clear(req.baseUrl, req.clearPersisted);
+    return { success: true };
+  });
+
+  ipcMain.handle(IPC_AUTH_START_OAUTH_FLOW, async (_event, req: OAuthFlowRequest) => {
+    return oauthFlow.startFlow(req);
+  });
+
+  // ── T047: Proxy Domain ─────────────────────────────────────────────────────
+
+  registerApiProxy(credentialStore, () => mainWindow);
 
   // ── T024: App Domain ───────────────────────────────────────────────────────
 
@@ -206,6 +312,17 @@ app.whenReady().then(() => {
     };
     mainWindow?.webContents.send(IPC_CLI_STREAM_RESPONSE, payload);
   });
+
+  // ── Auth health checks (T055) ────────────────────────────────────────────
+
+  if (mainWindow) {
+    credentialStore.startHealthChecks(mainWindow);
+  }
+
+  // Subscribe to auth push events emitted by health checks
+  // These are emitted via credentialStore.startHealthChecks → mainWindow.webContents.send
+  // The preload bridge re-emits them to the renderer via onTokenExpired /
+  // onConnectionStatusChanged subscriptions already wired in preload.ts.
 
   // macOS: re-create window when dock icon is clicked and no windows are open
   app.on('activate', () => {
