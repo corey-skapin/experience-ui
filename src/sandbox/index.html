@@ -3,11 +3,22 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <!-- CSP is injected dynamically by SandboxHost with a per-session nonce -->
+    <!--
+      CSP is injected dynamically via <meta http-equiv="Content-Security-Policy">
+      by SandboxHost using a per-session nonce. The strict policy is:
+        default-src 'none';
+        script-src 'nonce-{SESSION_NONCE}';
+        style-src 'nonce-{SESSION_NONCE}' 'unsafe-inline';
+        connect-src 'self';
+        frame-ancestors 'none';
+    -->
     <title>Sandbox</title>
   </head>
   <body>
     <div id="sandbox-root"></div>
-    <!-- bridge.ts and runtime.ts are injected by SandboxHost with nonces -->
+    <!--
+      bridge.ts and runtime.ts scripts are injected with nonce attributes
+      by SandboxHost after the INIT handshake.
+    -->
   </body>
 </html>
