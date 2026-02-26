@@ -23,63 +23,63 @@ Build a desktop application that wraps the Copilot CLI as an embedded subprocess
 
 ## Constitution Check
 
-*GATE: Must pass before Phase 0 research. Re-check after Phase 1 design.*
+_GATE: Must pass before Phase 0 research. Re-check after Phase 1 design._
 
 ### I. Code Quality — ✅ PASS
 
-| Requirement | Plan Compliance |
-|-------------|-----------------|
+| Requirement                              | Plan Compliance                                                                 |
+| ---------------------------------------- | ------------------------------------------------------------------------------- |
 | Naming, file org, code style conventions | Enforced via ESLint + Prettier; project conventions documented in quickstart.md |
-| Automated lint/format enforcement | ESLint strict config + Prettier + husky pre-commit hooks |
-| Single responsibility (≤300 LOC) | Enforced by ESLint max-lines rule; component decomposition in data model |
-| Shared logic extraction | Custom hooks for CLI communication, auth flow, sandbox messaging, tab state |
-| TypeScript strict — no `any` | `strict: true` in tsconfig; ESLint `@typescript-eslint/no-explicit-any` = error |
-| No dead code | ESLint `no-unused-vars`, `no-unused-imports`; enforced in CI |
+| Automated lint/format enforcement        | ESLint strict config + Prettier + husky pre-commit hooks                        |
+| Single responsibility (≤300 LOC)         | Enforced by ESLint max-lines rule; component decomposition in data model        |
+| Shared logic extraction                  | Custom hooks for CLI communication, auth flow, sandbox messaging, tab state     |
+| TypeScript strict — no `any`             | `strict: true` in tsconfig; ESLint `@typescript-eslint/no-explicit-any` = error |
+| No dead code                             | ESLint `no-unused-vars`, `no-unused-imports`; enforced in CI                    |
 
 ### II. Testing Standards — ✅ PASS
 
-| Requirement | Plan Compliance |
-|-------------|-----------------|
-| Unit tests for logic/hooks/utils | Vitest for all business logic, hooks, utilities |
-| Integration tests for composition | React Testing Library for component trees; Playwright for E2E flows |
-| Test-first development (Red-Green-Refactor) | Mandated in task execution workflow |
-| Coverage ≥80% per feature branch | Vitest coverage with c8/v8 provider; CI gate at 80% |
-| Deterministic tests (no network/timers) | All external deps mocked; MSW for API mocking; fake timers |
-| Accessibility tests (axe-core) | axe-core integration in component tests; CI gate for critical/serious |
-| Local pre-commit verification | husky + lint-staged running lint + type-check + test on staged files |
+| Requirement                                 | Plan Compliance                                                       |
+| ------------------------------------------- | --------------------------------------------------------------------- |
+| Unit tests for logic/hooks/utils            | Vitest for all business logic, hooks, utilities                       |
+| Integration tests for composition           | React Testing Library for component trees; Playwright for E2E flows   |
+| Test-first development (Red-Green-Refactor) | Mandated in task execution workflow                                   |
+| Coverage ≥80% per feature branch            | Vitest coverage with c8/v8 provider; CI gate at 80%                   |
+| Deterministic tests (no network/timers)     | All external deps mocked; MSW for API mocking; fake timers            |
+| Accessibility tests (axe-core)              | axe-core integration in component tests; CI gate for critical/serious |
+| Local pre-commit verification               | husky + lint-staged running lint + type-check + test on staged files  |
 
 ### III. User Experience Consistency — ✅ PASS
 
-| Requirement | Plan Compliance |
-|-------------|-----------------|
-| Design-system primitives | Radix UI primitives + custom design tokens (spacing, typography, color) |
-| Custom styling documented | Tailwind CSS with CSS custom properties; rationale in component docstrings |
-| WCAG 2.1 AA | Semantic HTML, ARIA, keyboard nav, color contrast; axe-core CI gate |
-| Established UX patterns | Documented interaction patterns for modals, forms, tabs, feedback |
-| Responsive breakpoints | Electron window resize handling; minimum 1024×768 viewport |
-| Error/loading/empty states | Explicit states designed per FR-026, FR-027, FR-028 |
+| Requirement                | Plan Compliance                                                            |
+| -------------------------- | -------------------------------------------------------------------------- |
+| Design-system primitives   | Radix UI primitives + custom design tokens (spacing, typography, color)    |
+| Custom styling documented  | Tailwind CSS with CSS custom properties; rationale in component docstrings |
+| WCAG 2.1 AA                | Semantic HTML, ARIA, keyboard nav, color contrast; axe-core CI gate        |
+| Established UX patterns    | Documented interaction patterns for modals, forms, tabs, feedback          |
+| Responsive breakpoints     | Electron window resize handling; minimum 1024×768 viewport                 |
+| Error/loading/empty states | Explicit states designed per FR-026, FR-027, FR-028                        |
 
 ### IV. Performance Requirements — ✅ PASS
 
-| Requirement | Plan Compliance |
-|-------------|-----------------|
-| LCP < 2.5s | Electron preload optimization; code splitting; lazy loading of heavy deps |
-| Bundle size budget | Tracked in CI; esbuild tree-shaking; dynamic imports for spec parsers |
+| Requirement                  | Plan Compliance                                                                   |
+| ---------------------------- | --------------------------------------------------------------------------------- |
+| LCP < 2.5s                   | Electron preload optimization; code splitting; lazy loading of heavy deps         |
+| Bundle size budget           | Tracked in CI; esbuild tree-shaking; dynamic imports for spec parsers             |
 | Avoid unnecessary re-renders | React.memo, useMemo, useCallback where profiling shows benefit; Zustand selectors |
-| Lazy loading media | Not heavily applicable (desktop app); lazy-load spec parser modules |
-| Third-party dep evaluation | Bundle analyzer in CI; prefer smaller alternatives |
-| Performance regression CI | Electron-specific performance benchmarks; bundle size tracking |
+| Lazy loading media           | Not heavily applicable (desktop app); lazy-load spec parser modules               |
+| Third-party dep evaluation   | Bundle analyzer in CI; prefer smaller alternatives                                |
+| Performance regression CI    | Electron-specific performance benchmarks; bundle size tracking                    |
 
 **Gate Result: ✅ ALL PRINCIPLES SATISFIED — proceeding to Phase 0**
 
 ### Post-Design Re-Check (after Phase 1)
 
-| Principle | Status | Notes |
-|-----------|--------|-------|
-| I. Code Quality | ✅ PASS | Project structure enforces single-responsibility (domain-organized components, separate hooks/stores/services). ESLint + Prettier + husky configured. All public types defined in `types/` directories. |
-| II. Testing Standards | ✅ PASS | Vitest for unit, RTL for integration, Playwright for E2E, axe-core for a11y. Deterministic tests via mocked IPC and CLI. Coverage ≥80% enforced. Local pre-commit hooks configured. |
-| III. UX Consistency | ✅ PASS | Radix UI primitives used for all interactive elements. Tailwind + CSS variables for design tokens. WCAG 2.1 AA: semantic HTML, ARIA, keyboard nav. All data components require loading/error/empty states per data model. |
-| IV. Performance | ✅ PASS | esbuild compilation in main process (off renderer thread). Lazy-loaded spec parsers. @tanstack/virtual for chat/console virtualization. SQLite + filesystem for O(1) version rollback. Bundle size tracked in CI. LCP target < 2.5s via Electron preload optimization. |
+| Principle             | Status  | Notes                                                                                                                                                                                                                                                                  |
+| --------------------- | ------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| I. Code Quality       | ✅ PASS | Project structure enforces single-responsibility (domain-organized components, separate hooks/stores/services). ESLint + Prettier + husky configured. All public types defined in `types/` directories.                                                                |
+| II. Testing Standards | ✅ PASS | Vitest for unit, RTL for integration, Playwright for E2E, axe-core for a11y. Deterministic tests via mocked IPC and CLI. Coverage ≥80% enforced. Local pre-commit hooks configured.                                                                                    |
+| III. UX Consistency   | ✅ PASS | Radix UI primitives used for all interactive elements. Tailwind + CSS variables for design tokens. WCAG 2.1 AA: semantic HTML, ARIA, keyboard nav. All data components require loading/error/empty states per data model.                                              |
+| IV. Performance       | ✅ PASS | esbuild compilation in main process (off renderer thread). Lazy-loaded spec parsers. @tanstack/virtual for chat/console virtualization. SQLite + filesystem for O(1) version rollback. Bundle size tracked in CI. LCP target < 2.5s via Electron preload optimization. |
 
 **Post-Design Gate Result: ✅ ALL PRINCIPLES SATISFIED — plan ready for task generation**
 

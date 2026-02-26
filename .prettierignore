@@ -1,0 +1,30 @@
+# Prettier ignore file
+# Files and directories that should NOT be formatted by Prettier
+
+# Dependencies
+node_modules/
+
+# Build outputs
+out/
+dist/
+dist-electron/
+coverage/
+
+# Lock files (auto-generated, formatting can break them)
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# Generated / minified assets
+*.min.js
+*.min.css
+
+# Electron builder artifacts
+dist-electron/
+
+# Test snapshots (formatting changes would break snapshot comparisons)
+**/__snapshots__/**
+
+# Playwright test results
+playwright-report/
+test-results/

@@ -24,12 +24,12 @@
 
 **Purpose**: Initialize the Electron + React + TypeScript project with build tooling, linting, formatting, and test infrastructure.
 
-- [ ] T001 Initialize Electron + React project with electron-vite scaffolding, create package.json with scripts (dev, build, test, lint, format, type-check, package) per quickstart.md
-- [ ] T002 Configure TypeScript strict mode — create tsconfig.json files for main, renderer, and sandbox process targets with `strict: true`, `noExplicitAny`, path alias `@/` pointing to `src/renderer/`
-- [ ] T003 [P] Install and configure ESLint 9 with `@typescript-eslint/parser`, `@typescript-eslint/no-explicit-any: error`, `max-lines` rule (300), `no-unused-vars`, `no-unused-imports` in eslint.config.js
-- [ ] T004 [P] Install and configure Prettier with consistent formatting rules in .prettierrc
-- [ ] T005 Configure husky + lint-staged for pre-commit hooks running lint, type-check, and test on staged files per constitution local verification gate
-- [ ] T006 [P] Set up Vitest (unit/integration), React Testing Library (component tests), Playwright (E2E), and axe-core (accessibility) test infrastructure with configuration files
+- [x] T001 Initialize Electron + React project with electron-vite scaffolding, create package.json with scripts (dev, build, test, lint, format, type-check, package) per quickstart.md
+- [x] T002 Configure TypeScript strict mode — create tsconfig.json files for main, renderer, and sandbox process targets with `strict: true`, `noExplicitAny`, path alias `@/` pointing to `src/renderer/`
+- [x] T003 [P] Install and configure ESLint 9 with `@typescript-eslint/parser`, `@typescript-eslint/no-explicit-any: error`, `max-lines` rule (300), `no-unused-vars`, `no-unused-imports` in eslint.config.js
+- [x] T004 [P] Install and configure Prettier with consistent formatting rules in .prettierrc
+- [x] T005 Configure husky + lint-staged for pre-commit hooks running lint, type-check, and test on staged files per constitution local verification gate
+- [x] T006 [P] Set up Vitest (unit/integration), React Testing Library (component tests), Playwright (E2E), and axe-core (accessibility) test infrastructure with configuration files
 
 ---
 
@@ -81,7 +81,7 @@
 - [ ] T028 [P] [US1] Implement OpenAPI 3.x parser — use @apidevtools/swagger-parser for validation and $ref dereferencing, transform to NormalizedSpec with endpoints[], models[], securitySchemes[], handle UnresolvedError for external refs by prompting user to provide them manually via a dialog per research.md R3 in src/renderer/services/spec-parser/openapi-parser.ts
 - [ ] T029 [P] [US1] Implement Swagger 2.0 parser — use swagger2openapi for 2.0→3.x conversion, then delegate to OpenAPI parser for normalization per research.md R3 in src/renderer/services/spec-parser/swagger-parser.ts
 - [ ] T030 [P] [US1] Implement GraphQL schema parser — use graphql package (buildSchema/introspectionFromSchema) + @graphql-tools/schema, transform to NormalizedSpec with queries[], mutations[], subscriptions[], models[] per research.md R3 in src/renderer/services/spec-parser/graphql-parser.ts
-- [ ] T031 [US1] Create spec parser facade — format auto-detection (check openapi field → 3.x, swagger field → 2.0, type Query/__schema → GraphQL), delegate to appropriate parser, return NormalizedSpec or validation errors, reject RAML/WSDL with supported-format suggestion in src/renderer/services/spec-parser/index.ts
+- [ ] T031 [US1] Create spec parser facade — format auto-detection (check openapi field → 3.x, swagger field → 2.0, type Query/\_\_schema → GraphQL), delegate to appropriate parser, return NormalizedSpec or validation errors, reject RAML/WSDL with supported-format suggestion in src/renderer/services/spec-parser/index.ts
 - [ ] T032 [US1] Implement code validator/sanitizer — scan generated code string for disallowed patterns per FR-034 (eval, Function(), document.cookie, window.parent, window.top, postMessage to non-host origins, Node.js requires), return violations with severity and instance count in src/renderer/services/code-validator/index.ts
 - [ ] T033 [US1] Implement code generation orchestrator — coordinate full pipeline: accept NormalizedSpec → send CLI generate request → receive generated code (with streaming) → invoke app:validate-code IPC → invoke app:compile-code IPC → return compiled bundle or error in src/renderer/services/code-generator/index.ts
 - [ ] T034 [P] [US1] Create ChatPanel component — virtualized message list using @tanstack/virtual (variable-height items), auto-scroll to bottom on new messages, display user/assistant/system messages, progress indicator during generation in src/renderer/components/chat/ChatPanel.tsx

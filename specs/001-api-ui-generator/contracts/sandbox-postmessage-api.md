@@ -25,11 +25,11 @@ All messages follow this base envelope:
 
 ```typescript
 interface SandboxMessage {
-  type: string;           // Message type from allowlist
-  payload: unknown;       // Type-specific payload
-  nonce: string;          // Session nonce for verification
-  timestamp: number;      // Unix timestamp (ms)
-  requestId?: string;     // For request/response correlation
+  type: string; // Message type from allowlist
+  payload: unknown; // Type-specific payload
+  nonce: string; // Session nonce for verification
+  timestamp: number; // Unix timestamp (ms)
+  requestId?: string; // For request/response correlation
 }
 ```
 
@@ -38,37 +38,40 @@ interface SandboxMessage {
 ## Host → Sandbox Messages
 
 ### `INIT`
+
 Initialize the sandbox with configuration and the generated React code bundle.
 
 ```typescript
 interface InitMessage {
   type: 'INIT';
   payload: {
-    nonce: string;              // Session nonce for subsequent messages
-    bundledCode: string;        // Compiled React/HTML/CSS bundle
-    reactRuntimeUrl: string;    // URL to pre-bundled React runtime
-    theme: 'light' | 'dark';   // Current host theme
+    nonce: string; // Session nonce for subsequent messages
+    bundledCode: string; // Compiled React/HTML/CSS bundle
+    reactRuntimeUrl: string; // URL to pre-bundled React runtime
+    theme: 'light' | 'dark'; // Current host theme
     containerSize: { width: number; height: number };
   };
 }
 ```
 
 ### `RENDER_DATA`
+
 Provide API response data to the generated UI for display.
 
 ```typescript
 interface RenderDataMessage {
   type: 'RENDER_DATA';
   payload: {
-    requestId: string;         // Correlates to a DATA_REQUEST
-    data: unknown;             // API response body
-    statusCode: number;        // HTTP status code
+    requestId: string; // Correlates to a DATA_REQUEST
+    data: unknown; // API response body
+    statusCode: number; // HTTP status code
     headers: Record<string, string>;
   };
 }
 ```
 
 ### `THEME_CHANGE`
+
 Notify sandbox of host theme change.
 
 ```typescript
@@ -81,6 +84,7 @@ interface ThemeChangeMessage {
 ```
 
 ### `RESIZE`
+
 Notify sandbox of container dimension change.
 
 ```typescript
@@ -94,13 +98,14 @@ interface ResizeMessage {
 ```
 
 ### `NETWORK_RESPONSE`
+
 Return the result of a proxied network request.
 
 ```typescript
 interface NetworkResponseMessage {
   type: 'NETWORK_RESPONSE';
   payload: {
-    requestId: string;         // Correlates to a NETWORK_REQUEST
+    requestId: string; // Correlates to a NETWORK_REQUEST
     status: number;
     statusText: string;
     headers: Record<string, string>;
@@ -111,6 +116,7 @@ interface NetworkResponseMessage {
 ```
 
 ### `DESTROY`
+
 Signal the sandbox to clean up before iframe removal.
 
 ```typescript
@@ -125,48 +131,52 @@ interface DestroyMessage {
 ## Sandbox → Host Messages
 
 ### `READY`
+
 Sandbox has initialized and is ready to receive data.
 
 ```typescript
 interface ReadyMessage {
   type: 'READY';
   payload: {
-    nonce: string;             // Echo back the session nonce
-    version: string;           // Sandbox runtime version
+    nonce: string; // Echo back the session nonce
+    version: string; // Sandbox runtime version
   };
 }
 ```
 
 ### `RENDER_COMPLETE`
+
 Generated UI has finished rendering.
 
 ```typescript
 interface RenderCompleteMessage {
   type: 'RENDER_COMPLETE';
   payload: {
-    componentCount: number;    // Number of rendered components
-    renderTimeMs: number;      // Time to render
+    componentCount: number; // Number of rendered components
+    renderTimeMs: number; // Time to render
   };
 }
 ```
 
 ### `NETWORK_REQUEST`
+
 Generated UI needs to make an API call (all network requests proxied through host).
 
 ```typescript
 interface NetworkRequestMessage {
   type: 'NETWORK_REQUEST';
   payload: {
-    requestId: string;         // Unique request ID for correlation
-    url: string;               // Target API URL
-    method: string;            // HTTP method
+    requestId: string; // Unique request ID for correlation
+    url: string; // Target API URL
+    method: string; // HTTP method
     headers: Record<string, string>;
-    body?: string;             // Request body
+    body?: string; // Request body
   };
 }
 ```
 
 ### `LOG`
+
 Console output from the generated UI (surfaced in debug console).
 
 ```typescript
@@ -181,6 +191,7 @@ interface LogMessage {
 ```
 
 ### `ERROR`
+
 Runtime error in the generated UI.
 
 ```typescript
@@ -190,12 +201,13 @@ interface ErrorMessage {
     message: string;
     stack?: string;
     componentName?: string;
-    isFatal: boolean;          // If true, sandbox should be reloaded
+    isFatal: boolean; // If true, sandbox should be reloaded
   };
 }
 ```
 
 ### `UI_EVENT`
+
 User interaction event within the generated UI (for chat panel feedback).
 
 ```typescript
@@ -203,8 +215,8 @@ interface UIEventMessage {
   type: 'UI_EVENT';
   payload: {
     eventType: 'click' | 'submit' | 'navigate' | 'select';
-    target: string;            // Component or element identifier
-    data?: unknown;            // Event-specific data
+    target: string; // Component or element identifier
+    data?: unknown; // Event-specific data
   };
 }
 ```
@@ -214,6 +226,7 @@ interface UIEventMessage {
 ## Message Type Allowlists
 
 ### Host Accepts (from Sandbox)
+
 ```typescript
 const HOST_ALLOWED_TYPES = [
   'READY',
@@ -226,6 +239,7 @@ const HOST_ALLOWED_TYPES = [
 ```
 
 ### Sandbox Accepts (from Host)
+
 ```typescript
 const SANDBOX_ALLOWED_TYPES = [
   'INIT',
@@ -267,11 +281,11 @@ Host                          Sandbox (iframe)
 
 ## Error Handling
 
-| Scenario | Host Behavior | Sandbox Behavior |
-|----------|---------------|------------------|
-| Nonce mismatch on READY | Destroy iframe, log security warning | N/A |
-| Unknown message type received | Silently ignore, log to debug console | Silently ignore |
-| NETWORK_REQUEST timeout (>10s) | Send NETWORK_RESPONSE with error | Show loading timeout |
-| Fatal ERROR from sandbox | Reload iframe with last safe version | Attempt graceful shutdown |
-| CSP violation in sandbox | Log violation via debug console | Blocked silently by browser |
-| Malformed message payload | Ignore message, log validation error | Ignore message |
+| Scenario                       | Host Behavior                         | Sandbox Behavior            |
+| ------------------------------ | ------------------------------------- | --------------------------- |
+| Nonce mismatch on READY        | Destroy iframe, log security warning  | N/A                         |
+| Unknown message type received  | Silently ignore, log to debug console | Silently ignore             |
+| NETWORK_REQUEST timeout (>10s) | Send NETWORK_RESPONSE with error      | Show loading timeout        |
+| Fatal ERROR from sandbox       | Reload iframe with last safe version  | Attempt graceful shutdown   |
+| CSP violation in sandbox       | Log violation via debug console       | Blocked silently by browser |
+| Malformed message payload      | Ignore message, log validation error  | Ignore message              |

@@ -1,0 +1,69 @@
+# Git ignore for Experience UI — Electron + React + TypeScript project
+
+# ─── Dependencies ─────────────────────────────────────────────────────────────
+node_modules/
+
+# ─── Build outputs ────────────────────────────────────────────────────────────
+out/
+dist/
+dist-electron/
+build/
+
+# ─── Test outputs ─────────────────────────────────────────────────────────────
+coverage/
+playwright-report/
+test-results/
+.vitest-cache/
+
+# ─── TypeScript build info ────────────────────────────────────────────────────
+*.tsbuildinfo
+
+# ─── Environment variables (NEVER commit secrets) ────────────────────────────
+.env
+.env.local
+.env.development
+.env.test
+.env.production
+.env*.local
+
+# ─── Editor configs ───────────────────────────────────────────────────────────
+.vscode/settings.json
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# ─── OS artifacts ─────────────────────────────────────────────────────────────
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# ─── Logs ─────────────────────────────────────────────────────────────────────
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+.pnpm-debug.log*
+
+# ─── Electron specific ────────────────────────────────────────────────────────
+# Electron builder outputs
+dist-electron/
+release/
+*.dmg
+*.exe
+*.AppImage
+*.snap
+*.deb
+*.rpm
+
+# ─── Temp files ───────────────────────────────────────────────────────────────
+*.tmp
+*.temp
+.cache/

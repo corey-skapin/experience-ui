@@ -1,0 +1,5 @@
+# Experience UI pre-commit hook
+# Runs lint-staged: lint + type-check + test on staged files
+# Per constitution local verification gate requirement
+
+npm run pre-commit

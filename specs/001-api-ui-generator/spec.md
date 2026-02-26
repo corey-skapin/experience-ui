@@ -15,7 +15,7 @@
 - Q: Which API specification formats must be supported? → A: OpenAPI 3.x, Swagger 2.0, and GraphQL only (RAML and WSDL are out of scope).
 - Q: How should the generated UI be rendered within the host application? → A: Generated code (React/HTML/CSS compiled and rendered in a sandboxed iframe) with mandatory security requirements — strict CSP, no parent window access, no localStorage/host filesystem access, network requests proxied through host, code validated/sanitized before execution.
 
-## User Scenarios & Testing *(mandatory)*
+## User Scenarios & Testing _(mandatory)_
 
 ### User Story 1 — Application Shell & API Spec Ingestion (Priority: P1)
 
@@ -152,7 +152,7 @@ The user can install tools and plugins — such as MCP (Model Context Protocol) 
 - What happens when the sandboxed iframe attempts a disallowed action (e.g., accessing parent window or making a direct network request)? The CSP and sandbox restrictions MUST silently block the action. The host application MUST log the violation for debugging via the console panel but MUST NOT crash or expose host state.
 - What happens when the user sends multiple customization requests in rapid succession? The system MUST process them sequentially — each request waits for the preceding change to complete. The chat panel MUST display a queued/pending status for waiting requests so the user knows their input was received.
 
-## Requirements *(mandatory)*
+## Requirements _(mandatory)_
 
 ### Functional Requirements
 
@@ -225,7 +225,7 @@ The user can install tools and plugins — such as MCP (Model Context Protocol) 
 - **Tab**: A workspace container that holds one generated interface and its associated API connection. Attributes include title, display order, active/inactive state, and independent customization history. The application supports multiple concurrent tabs.
 - **Tool/Plugin**: An installed extension that provides additional capabilities to the Copilot CLI and generated interfaces. Attributes include name, type (e.g., MCP server), version, installation status, and configuration parameters.
 
-## Success Criteria *(mandatory)*
+## Success Criteria _(mandatory)_
 
 ### Measurable Outcomes
 
