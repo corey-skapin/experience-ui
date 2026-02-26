@@ -6,6 +6,7 @@
 //   - renderer: React renderer (browser environment)
 import { resolve } from 'path';
 
+import tailwindcss from '@tailwindcss/vite';
 import react from '@vitejs/plugin-react';
 import { defineConfig, externalizeDepsPlugin } from 'electron-vite';
 
@@ -37,7 +38,7 @@ export default defineConfig({
         '@': resolve(__dirname, 'src/renderer'),
       },
     },
-    plugins: [react()],
+    plugins: [tailwindcss(), react()],
     build: {
       rollupOptions: {
         input: {

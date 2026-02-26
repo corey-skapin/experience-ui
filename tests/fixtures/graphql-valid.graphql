@@ -1,0 +1,156 @@
+# Valid GraphQL schema for Experience UI testing
+# Represents a simple Blog API
+
+type Query {
+  """Get a single post by ID"""
+  post(id: ID!): Post
+
+  """List all posts with optional filtering"""
+  posts(
+    limit: Int = 20
+    offset: Int = 0
+    authorId: ID
+    status: PostStatus
+  ): PostConnection!
+
+  """Get a user by ID"""
+  user(id: ID!): User
+
+  """List all users"""
+  users(limit: Int = 20, offset: Int = 0): [User!]!
+
+  """Get a comment by ID"""
+  comment(id: ID!): Comment
+
+  """Get comments for a post"""
+  comments(postId: ID!, limit: Int = 50): [Comment!]!
+
+  """Get all tags"""
+  tags: [Tag!]!
+
+  """Search posts by keyword"""
+  searchPosts(query: String!, limit: Int = 10): [Post!]!
+}
+
+type Mutation {
+  """Create a new post"""
+  createPost(input: CreatePostInput!): Post!
+
+  """Update an existing post"""
+  updatePost(id: ID!, input: UpdatePostInput!): Post!
+
+  """Delete a post"""
+  deletePost(id: ID!): Boolean!
+
+  """Publish a post (change status to PUBLISHED)"""
+  publishPost(id: ID!): Post!
+
+  """Create a new user"""
+  createUser(input: CreateUserInput!): User!
+
+  """Update user profile"""
+  updateUser(id: ID!, input: UpdateUserInput!): User!
+
+  """Add a comment to a post"""
+  addComment(postId: ID!, content: String!): Comment!
+
+  """Delete a comment"""
+  deleteComment(id: ID!): Boolean!
+
+  """Add a tag to a post"""
+  addTag(postId: ID!, tag: String!): Post!
+}
+
+type Subscription {
+  """Subscribe to new comments on a post"""
+  commentAdded(postId: ID!): Comment!
+
+  """Subscribe to post status changes"""
+  postStatusChanged(postId: ID!): Post!
+}
+
+# ─── Types ───────────────────────────────────────────────────────────────────
+
+type Post {
+  id: ID!
+  title: String!
+  content: String!
+  excerpt: String
+  author: User!
+  status: PostStatus!
+  tags: [Tag!]!
+  comments: [Comment!]!
+  commentCount: Int!
+  createdAt: String!
+  updatedAt: String!
+  publishedAt: String
+}
+
+type PostConnection {
+  nodes: [Post!]!
+  totalCount: Int!
+  hasNextPage: Boolean!
+}
+
+type User {
+  id: ID!
+  name: String!
+  email: String!
+  bio: String
+  avatarUrl: String
+  posts: [Post!]!
+  postCount: Int!
+  createdAt: String!
+}
+
+type Comment {
+  id: ID!
+  content: String!
+  author: User!
+  post: Post!
+  createdAt: String!
+}
+
+type Tag {
+  id: ID!
+  name: String!
+  slug: String!
+  postCount: Int!
+}
+
+# ─── Enums ───────────────────────────────────────────────────────────────────
+
+enum PostStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+}
+
+# ─── Input Types ─────────────────────────────────────────────────────────────
+
+input CreatePostInput {
+  title: String!
+  content: String!
+  excerpt: String
+  tags: [String!]
+  status: PostStatus = DRAFT
+}
+
+input UpdatePostInput {
+  title: String
+  content: String
+  excerpt: String
+  tags: [String!]
+}
+
+input CreateUserInput {
+  name: String!
+  email: String!
+  bio: String
+}
+
+input UpdateUserInput {
+  name: String
+  bio: String
+  avatarUrl: String
+}

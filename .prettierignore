@@ -28,3 +28,6 @@ dist-electron/
 # Playwright test results
 playwright-report/
 test-results/
+
+# Intentionally invalid test fixtures
+tests/fixtures/invalid-malformed.json

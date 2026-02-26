@@ -1,12 +1,12 @@
 // src/renderer/index.tsx
-// React root mount — bootstraps the React 19 application with StrictMode.
-//
-// A global error boundary wraps the entire app to catch unhandled render
-// errors and display a friendly fallback UI (implemented fully in T012).
+// React root mount (T012) — bootstraps the React 19 application with StrictMode
+// and a global error boundary to catch unhandled render errors.
 import React from 'react';
 import { createRoot } from 'react-dom/client';
 
 import App from './App';
+import { GlobalErrorBoundary } from './components/common/ErrorBoundary';
+import './styles/global.css';
 
 const rootElement = document.getElementById('root');
 
@@ -21,6 +21,8 @@ const root = createRoot(rootElement);
 
 root.render(
   <React.StrictMode>
-    <App />
+    <GlobalErrorBoundary>
+      <App />
+    </GlobalErrorBoundary>
   </React.StrictMode>,
 );
