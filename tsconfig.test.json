@@ -4,7 +4,9 @@
     "tests/**/*",
     "vitest.config.ts",
     "playwright.config.ts",
+    "src/main/**/*",
     "src/renderer/**/*",
+    "src/sandbox/**/*",
     "src/shared/**/*"
   ],
   "compilerOptions": {
