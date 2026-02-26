@@ -1,0 +1,137 @@
+"""
+Valid GraphQL schema fixture for testing.
+Represents a blog/content management API.
+"""
+
+type Query {
+  """Get a single post by ID."""
+  post(id: ID!): Post
+
+  """List all posts with optional filtering."""
+  posts(limit: Int, offset: Int, authorId: ID): PostConnection!
+
+  """Get a user by ID."""
+  user(id: ID!): User
+
+  """List all users."""
+  users(limit: Int, offset: Int): [User!]!
+
+  """Search posts by keyword."""
+  searchPosts(query: String!, limit: Int): [Post!]!
+
+  """Get all available tags."""
+  tags: [Tag!]!
+}
+
+type Mutation {
+  """Create a new blog post."""
+  createPost(input: CreatePostInput!): Post!
+
+  """Update an existing post."""
+  updatePost(id: ID!, input: UpdatePostInput!): Post!
+
+  """Delete a post."""
+  deletePost(id: ID!): Boolean!
+
+  """Add a comment to a post."""
+  addComment(postId: ID!, input: AddCommentInput!): Comment!
+
+  """Delete a comment."""
+  deleteComment(id: ID!): Boolean!
+
+  """Follow a user."""
+  followUser(userId: ID!): User!
+
+  """Unfollow a user."""
+  unfollowUser(userId: ID!): User!
+}
+
+type Subscription {
+  """Subscribe to new comments on a post."""
+  commentAdded(postId: ID!): Comment!
+
+  """Subscribe to post updates."""
+  postUpdated(postId: ID!): Post!
+}
+
+type Post {
+  id: ID!
+  title: String!
+  body: String!
+  excerpt: String
+  status: PostStatus!
+  author: User!
+  comments: [Comment!]!
+  tags: [Tag!]!
+  viewCount: Int!
+  likeCount: Int!
+  createdAt: String!
+  updatedAt: String!
+}
+
+type User {
+  id: ID!
+  name: String!
+  email: String!
+  avatarUrl: String
+  bio: String
+  role: UserRole!
+  posts: [Post!]!
+  followers: [User!]!
+  following: [User!]!
+  createdAt: String!
+}
+
+type Comment {
+  id: ID!
+  body: String!
+  author: User!
+  post: Post!
+  createdAt: String!
+  updatedAt: String!
+}
+
+type Tag {
+  id: ID!
+  name: String!
+  slug: String!
+  postCount: Int!
+}
+
+type PostConnection {
+  nodes: [Post!]!
+  totalCount: Int!
+  hasNextPage: Boolean!
+}
+
+input CreatePostInput {
+  title: String!
+  body: String!
+  excerpt: String
+  status: PostStatus
+  tagIds: [ID!]
+}
+
+input UpdatePostInput {
+  title: String
+  body: String
+  excerpt: String
+  status: PostStatus
+  tagIds: [ID!]
+}
+
+input AddCommentInput {
+  body: String!
+}
+
+enum PostStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+}
+
+enum UserRole {
+  ADMIN
+  AUTHOR
+  READER
+}

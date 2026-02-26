@@ -1,6 +1,6 @@
 /**
  * Global stylesheet with CSS custom properties for design tokens.
- * Supports light/dark themes via Tailwind CSS dark: variant.
+ * Supports light/dark themes via both system preference and .dark class override.
  */
 
 @import 'tailwindcss';
@@ -53,9 +53,9 @@
   --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
 }
 
-/* ─── Design Tokens (Dark Theme) ──────────────────────────────────────── */
+/* ─── Design Tokens (Dark Theme via system preference) ─────────────────── */
 @media (prefers-color-scheme: dark) {
-  :root {
+  :root:not(.dark):not(.light) {
     --color-bg-primary: #0f172a;
     --color-bg-secondary: #1e293b;
     --color-bg-tertiary: #334155;
@@ -72,6 +72,25 @@
     --color-error: #f87171;
     --color-info: #818cf8;
   }
+}
+
+/* ─── Design Tokens (Dark Theme via .dark class override) ──────────────── */
+.dark {
+  --color-bg-primary: #0f172a;
+  --color-bg-secondary: #1e293b;
+  --color-bg-tertiary: #334155;
+  --color-border: #334155;
+  --color-border-strong: #475569;
+  --color-text-primary: #f8fafc;
+  --color-text-secondary: #94a3b8;
+  --color-text-disabled: #64748b;
+  --color-accent: #60a5fa;
+  --color-accent-hover: #93c5fd;
+  --color-accent-text: #0f172a;
+  --color-success: #34d399;
+  --color-warning: #fbbf24;
+  --color-error: #f87171;
+  --color-info: #818cf8;
 }
 
 /* ─── Base Reset ──────────────────────────────────────────────────────── */
