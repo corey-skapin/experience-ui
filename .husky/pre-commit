@@ -1,0 +1,6 @@
+#!/usr/bin/env sh
+# Pre-commit hook: run lint-staged on all staged files.
+# lint-staged is configured in package.json to run:
+#   - eslint + prettier on .ts/.tsx/.js files
+#   - prettier on .json/.md/.yaml/.yml/.css files
+npx lint-staged

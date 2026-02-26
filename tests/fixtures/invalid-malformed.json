@@ -1,0 +1,8 @@
+{
+  "this is": "not a valid API spec",
+  "random": 42,
+  "nested": {
+    "garbage": [null, true, {}]
+  },
+  "__comment": "This fixture intentionally contains malformed/invalid data to test error handling."
+}

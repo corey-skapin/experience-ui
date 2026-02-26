@@ -1,0 +1,65 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "External Refs API",
+    "version": "1.0.0",
+    "description": "A spec that references external schema files — used to test external $ref resolution."
+  },
+  "servers": [{ "url": "https://refs.example.com/v1" }],
+  "paths": {
+    "/items": {
+      "get": {
+        "operationId": "listItems",
+        "summary": "List items",
+        "responses": {
+          "200": {
+            "description": "Items list",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "./schemas/item-list.json"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/items/{id}": {
+      "get": {
+        "operationId": "getItem",
+        "summary": "Get item by ID",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Item details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "./schemas/item.json"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "https://schemas.example.com/common/error.json"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

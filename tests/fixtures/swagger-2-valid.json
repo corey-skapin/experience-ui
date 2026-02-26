@@ -1,0 +1,164 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "User Management API",
+    "version": "2.0.0",
+    "description": "A sample Swagger 2.0 specification for user management."
+  },
+  "host": "api.example.com",
+  "basePath": "/v2",
+  "schemes": ["https"],
+  "consumes": ["application/json"],
+  "produces": ["application/json"],
+  "paths": {
+    "/users": {
+      "get": {
+        "operationId": "getUsers",
+        "summary": "List all users",
+        "tags": ["users"],
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "type": "integer",
+            "required": false,
+            "default": 1
+          },
+          {
+            "name": "pageSize",
+            "in": "query",
+            "type": "integer",
+            "required": false,
+            "default": 20
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of users",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "data": {
+                  "type": "array",
+                  "items": { "$ref": "#/definitions/User" }
+                },
+                "total": { "type": "integer" }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "operationId": "createUser",
+        "summary": "Create a new user",
+        "tags": ["users"],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "required": true,
+            "schema": { "$ref": "#/definitions/NewUser" }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "User created",
+            "schema": { "$ref": "#/definitions/User" }
+          },
+          "400": {
+            "description": "Validation error",
+            "schema": { "$ref": "#/definitions/Error" }
+          }
+        }
+      }
+    },
+    "/users/{userId}": {
+      "get": {
+        "operationId": "getUserById",
+        "summary": "Get user by ID",
+        "tags": ["users"],
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "User details",
+            "schema": { "$ref": "#/definitions/User" }
+          },
+          "404": { "description": "User not found" }
+        }
+      },
+      "put": {
+        "operationId": "updateUser",
+        "summary": "Update a user",
+        "tags": ["users"],
+        "parameters": [
+          { "name": "userId", "in": "path", "required": true, "type": "string" },
+          {
+            "in": "body",
+            "name": "body",
+            "required": true,
+            "schema": { "$ref": "#/definitions/UpdateUser" }
+          }
+        ],
+        "responses": {
+          "200": { "description": "User updated", "schema": { "$ref": "#/definitions/User" } }
+        }
+      },
+      "delete": {
+        "operationId": "deleteUser",
+        "summary": "Delete a user",
+        "tags": ["users"],
+        "parameters": [{ "name": "userId", "in": "path", "required": true, "type": "string" }],
+        "responses": {
+          "204": { "description": "User deleted" },
+          "404": { "description": "User not found" }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "User": {
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "format": "uuid" },
+        "email": { "type": "string", "format": "email" },
+        "name": { "type": "string" },
+        "role": { "type": "string", "enum": ["admin", "user", "guest"] },
+        "createdAt": { "type": "string", "format": "date-time" }
+      }
+    },
+    "NewUser": {
+      "type": "object",
+      "required": ["email", "name"],
+      "properties": {
+        "email": { "type": "string", "format": "email" },
+        "name": { "type": "string" },
+        "role": { "type": "string", "enum": ["admin", "user", "guest"], "default": "user" }
+      }
+    },
+    "UpdateUser": {
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "role": { "type": "string", "enum": ["admin", "user", "guest"] }
+      }
+    },
+    "Error": {
+      "type": "object",
+      "properties": {
+        "message": { "type": "string" },
+        "field": { "type": "string" }
+      }
+    }
+  },
+  "securityDefinitions": {
+    "basicAuth": { "type": "basic" },
+    "apiKey": { "type": "apiKey", "in": "header", "name": "X-API-Key" }
+  }
+}
