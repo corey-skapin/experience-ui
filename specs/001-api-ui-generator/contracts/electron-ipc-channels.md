@@ -35,6 +35,7 @@ Domains: `cli`, `auth`, `proxy`, `versions`, `plugins`, `app`
 ### CLI Domain
 
 #### `cli:send-message`
+
 Send a message to the Copilot CLI subprocess.
 
 ```typescript
@@ -58,6 +59,7 @@ interface CLISendMessageResponse {
 ```
 
 #### `cli:get-status`
+
 Get current CLI subprocess status.
 
 ```typescript
@@ -69,11 +71,12 @@ interface CLIStatusResponse {
   pid: number | null;
   restartCount: number;
   pendingRequests: number;
-  uptime: number | null;     // milliseconds
+  uptime: number | null; // milliseconds
 }
 ```
 
 #### `cli:restart`
+
 Force restart the CLI subprocess.
 
 ```typescript
@@ -91,17 +94,24 @@ interface CLIRestartResponse {
 ### Auth Domain
 
 #### `auth:configure`
+
 Set up authentication for an API base URL.
 
 ```typescript
 // Renderer → Main
 interface AuthConfigureRequest {
   baseUrl: string;
-  method: 
+  method:
     | { type: 'apiKey'; headerName: string; key: string }
     | { type: 'bearer'; token: string }
-    | { type: 'oauth2'; clientId: string; authEndpoint: string; tokenEndpoint: string; scopes: string[] };
-  persist: boolean;          // Whether to save to OS keychain
+    | {
+        type: 'oauth2';
+        clientId: string;
+        authEndpoint: string;
+        tokenEndpoint: string;
+        scopes: string[];
+      };
+  persist: boolean; // Whether to save to OS keychain
 }
 
 // Main → Renderer (response)
@@ -113,13 +123,14 @@ interface AuthConfigureResponse {
 ```
 
 #### `auth:test-connection`
+
 Test API connectivity with current credentials.
 
 ```typescript
 // Renderer → Main
 interface AuthTestRequest {
   baseUrl: string;
-  healthCheckPath?: string;  // Default: '/' or '/health'
+  healthCheckPath?: string; // Default: '/' or '/health'
 }
 
 // Main → Renderer (response)
@@ -133,6 +144,7 @@ interface AuthTestResponse {
 ```
 
 #### `auth:get-connection-status`
+
 Get current connection status for a base URL.
 
 ```typescript
@@ -146,12 +158,13 @@ interface AuthStatusResponse {
   configured: boolean;
   status: 'disconnected' | 'connected' | 'degraded' | 'expired' | 'unreachable';
   authMethod: 'apiKey' | 'bearer' | 'oauth2' | 'none';
-  lastVerifiedAt: string | null;  // ISO 8601
+  lastVerifiedAt: string | null; // ISO 8601
   responseTimeMs: number | null;
 }
 ```
 
 #### `auth:start-oauth-flow`
+
 Initiate OAuth 2.0 PKCE flow in a dedicated browser window.
 
 ```typescript
@@ -174,13 +187,14 @@ interface OAuthFlowResponse {
 ```
 
 #### `auth:clear-credentials`
+
 Remove stored credentials for a base URL.
 
 ```typescript
 // Renderer → Main
 interface AuthClearRequest {
   baseUrl: string;
-  clearPersisted: boolean;   // Also remove from OS keychain
+  clearPersisted: boolean; // Also remove from OS keychain
 }
 
 // Main → Renderer (response)
@@ -194,6 +208,7 @@ interface AuthClearResponse {
 ### Proxy Domain
 
 #### `proxy:api-request`
+
 Proxy an API request through the main process (used by sandbox network proxy).
 
 ```typescript
@@ -204,7 +219,7 @@ interface ProxyAPIRequest {
   method: string;
   headers: Record<string, string>;
   body?: string;
-  timeout?: number;          // Default: 30000ms
+  timeout?: number; // Default: 30000ms
 }
 
 // Main → Renderer (response)
@@ -222,6 +237,7 @@ interface ProxyAPIResponse {
 ### Versions Domain
 
 #### `versions:save-snapshot`
+
 Save a new interface version to disk.
 
 ```typescript
@@ -248,14 +264,15 @@ interface VersionSaveResponse {
 ```
 
 #### `versions:list`
+
 List all versions for an interface.
 
 ```typescript
 // Renderer → Main
 interface VersionListRequest {
   interfaceId: string;
-  page?: number;             // Default: 1
-  pageSize?: number;         // Default: 50
+  page?: number; // Default: 1
+  pageSize?: number; // Default: 50
 }
 
 // Main → Renderer (response)
@@ -267,7 +284,7 @@ interface VersionListResponse {
     changeType: string;
     description: string;
     isRevert: boolean;
-    createdAt: string;       // ISO 8601
+    createdAt: string; // ISO 8601
   }>;
   totalCount: number;
   page: number;
@@ -276,6 +293,7 @@ interface VersionListResponse {
 ```
 
 #### `versions:load-code`
+
 Load generated code for a specific version.
 
 ```typescript
@@ -294,6 +312,7 @@ interface VersionLoadResponse {
 ```
 
 #### `versions:get-diff`
+
 Get a diff between two versions.
 
 ```typescript
@@ -321,14 +340,15 @@ interface VersionDiffResponse {
 ### Plugins Domain
 
 #### `plugins:install`
+
 Install a tool/plugin.
 
 ```typescript
 // Renderer → Main
 interface PluginInstallRequest {
-  source: string;            // Package reference, path, or URL
+  source: string; // Package reference, path, or URL
   type: 'mcp-server' | 'transformer' | 'integration';
-  name?: string;             // Optional display name override
+  name?: string; // Optional display name override
 }
 
 // Main → Renderer (response)
@@ -343,24 +363,26 @@ interface PluginInstallResponse {
 ```
 
 #### `plugins:uninstall`
+
 Uninstall a plugin.
 
 ```typescript
 // Renderer → Main
 interface PluginUninstallRequest {
   pluginId: string;
-  force: boolean;            // Skip dependent interface warning
+  force: boolean; // Skip dependent interface warning
 }
 
 // Main → Renderer (response)
 interface PluginUninstallResponse {
   success: boolean;
-  dependentInterfaces?: string[];  // Affected interfaces (if force=false and deps exist)
+  dependentInterfaces?: string[]; // Affected interfaces (if force=false and deps exist)
   error?: string;
 }
 ```
 
 #### `plugins:list`
+
 List all installed plugins.
 
 ```typescript
@@ -375,7 +397,7 @@ interface PluginListResponse {
     version: string;
     status: string;
     capabilities: string[];
-    installedAt: string;     // ISO 8601
+    installedAt: string; // ISO 8601
   }>;
 }
 ```
@@ -385,6 +407,7 @@ interface PluginListResponse {
 ### App Domain
 
 #### `app:compile-code`
+
 Compile generated React/JSX code via esbuild.
 
 ```typescript
@@ -407,6 +430,7 @@ interface CompileCodeResponse {
 ```
 
 #### `app:validate-code`
+
 Validate generated code for disallowed patterns before sandbox injection.
 
 ```typescript
@@ -433,6 +457,7 @@ interface ValidateCodeResponse {
 These are one-way notifications from main process to renderer.
 
 #### `cli:status-changed`
+
 CLI subprocess status has changed.
 
 ```typescript
@@ -443,6 +468,7 @@ interface CLIStatusChangedEvent {
 ```
 
 #### `cli:stream-response`
+
 Streaming response chunk from CLI (for real-time chat display).
 
 ```typescript
@@ -454,6 +480,7 @@ interface CLIStreamResponseEvent {
 ```
 
 #### `auth:token-expired`
+
 Credentials for a base URL have expired.
 
 ```typescript
@@ -464,6 +491,7 @@ interface TokenExpiredEvent {
 ```
 
 #### `auth:token-refreshed`
+
 Credentials were automatically refreshed.
 
 ```typescript
@@ -473,6 +501,7 @@ interface TokenRefreshedEvent {
 ```
 
 #### `auth:connection-status-changed`
+
 Connection status for a base URL has changed.
 
 ```typescript
@@ -484,13 +513,14 @@ interface ConnectionStatusChangedEvent {
 ```
 
 #### `plugins:status-changed`
+
 Plugin installation/lifecycle status changed.
 
 ```typescript
 interface PluginStatusChangedEvent {
   pluginId: string;
   status: 'installed' | 'installing' | 'error' | 'uninstalling';
-  progress?: number;         // 0-100 for installation progress
+  progress?: number; // 0-100 for installation progress
   error?: string;
 }
 ```

@@ -182,17 +182,17 @@ production in this repository.
 
 Quality gates define the minimum bar that every change MUST clear.
 
-| Gate | Requirement | Enforcement |
-|------|-------------|-------------|
-| Local pre-commit | Tests, lint, type-check, format all pass locally | Pre-commit hooks (husky + lint-staged) |
-| Lint | Zero errors, zero warnings | CI ÔÇö auto-block |
-| Type check | Strict mode, no suppressions without justification | CI ÔÇö auto-block |
-| Unit tests | All pass, coverage ÔëÑ baseline | CI ÔÇö auto-block |
-| Integration tests | All pass | CI ÔÇö auto-block |
-| Accessibility | axe-core: zero critical/serious violations | CI ÔÇö auto-block |
-| Bundle size | Within defined budget | CI ÔÇö warning/block |
-| Performance | LCP < 2.5 s, no regressions | CI ÔÇö warning |
-| Review | ÔëÑ 1 approval | GitHub branch protection |
+| Gate              | Requirement                                        | Enforcement                            |
+| ----------------- | -------------------------------------------------- | -------------------------------------- |
+| Local pre-commit  | Tests, lint, type-check, format all pass locally   | Pre-commit hooks (husky + lint-staged) |
+| Lint              | Zero errors, zero warnings                         | CI — auto-block                        |
+| Type check        | Strict mode, no suppressions without justification | CI — auto-block                        |
+| Unit tests        | All pass, coverage ≥ baseline                      | CI — auto-block                        |
+| Integration tests | All pass                                           | CI — auto-block                        |
+| Accessibility     | axe-core: zero critical/serious violations         | CI — auto-block                        |
+| Bundle size       | Within defined budget                              | CI — warning/block                     |
+| Performance       | LCP < 2.5 s, no regressions                        | CI — warning                           |
+| Review            | ≥ 1 approval                                       | GitHub branch protection               |
 
 ## Governance
 

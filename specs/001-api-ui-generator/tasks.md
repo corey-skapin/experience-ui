@@ -24,12 +24,12 @@
 
 **Purpose**: Initialize the Electron + React + TypeScript project with build tooling, linting, formatting, and test infrastructure.
 
-- [ ] T001 Initialize Electron + React project with electron-vite scaffolding, create package.json with scripts (dev, build, test, lint, format, type-check, package) per quickstart.md
-- [ ] T002 Configure TypeScript strict mode — create tsconfig.json files for main, renderer, and sandbox process targets with `strict: true`, `noExplicitAny`, path alias `@/` pointing to `src/renderer/`
-- [ ] T003 [P] Install and configure ESLint 9 with `@typescript-eslint/parser`, `@typescript-eslint/no-explicit-any: error`, `max-lines` rule (300), `no-unused-vars`, `no-unused-imports` in eslint.config.js
-- [ ] T004 [P] Install and configure Prettier with consistent formatting rules in .prettierrc
-- [ ] T005 Configure husky + lint-staged for pre-commit hooks running lint, type-check, and test on staged files per constitution local verification gate
-- [ ] T006 [P] Set up Vitest (unit/integration), React Testing Library (component tests), Playwright (E2E), and axe-core (accessibility) test infrastructure with configuration files
+- [x] T001 Initialize Electron + React project with electron-vite scaffolding, create package.json with scripts (dev, build, test, lint, format, type-check, package) per quickstart.md
+- [x] T002 Configure TypeScript strict mode — create tsconfig.json files for main, renderer, and sandbox process targets with `strict: true`, `noExplicitAny`, path alias `@/` pointing to `src/renderer/`
+- [x] T003 [P] Install and configure ESLint 9 with `@typescript-eslint/parser`, `@typescript-eslint/no-explicit-any: error`, `max-lines` rule (300), `no-unused-vars`, `no-unused-imports` in eslint.config.js
+- [x] T004 [P] Install and configure Prettier with consistent formatting rules in .prettierrc
+- [x] T005 Configure husky + lint-staged for pre-commit hooks running lint, type-check, and test on staged files per constitution local verification gate
+- [x] T006 [P] Set up Vitest (unit/integration), React Testing Library (component tests), Playwright (E2E), and axe-core (accessibility) test infrastructure with configuration files
 
 ---
 
@@ -39,16 +39,16 @@
 
 **⚠️ CRITICAL**: No user story work can begin until this phase is complete.
 
-- [ ] T007 Define all shared TypeScript types and interfaces from data-model.md in src/shared/types/ — APISpec, NormalizedSpec, NormalizedEndpoint, NormalizedOperation, NormalizedModel, SecurityScheme, SpecSource, SpecMetadata, ValidationError, GeneratedInterface, SandboxState, InterfaceVersion, APIConnection, AuthMethod, ConnectionStatus, CLIState, Plugin, Tab, ChatMessage, MessageAttachment, CustomizationRequest, ConsoleEntry, ConsoleRequest, ConsoleResponse, ApplicationState
-- [ ] T008 [P] Define IPC channel name constants for all domains (cli, auth, proxy, versions, plugins, app) and push notification channel names per electron-ipc-channels.md contract in src/shared/ipc-channels.ts
-- [ ] T009 [P] Define application constants (default split ratio 30/70, max chat panel width 85%, min 15%, max restart retries 5, request timeouts, CSP policy template, disallowed code patterns list, sandbox message type allowlists) in src/shared/constants.ts
-- [ ] T010 Create Electron main process entry — BrowserWindow creation with `contextIsolation: true`, `nodeIntegration: false`, `sandbox: true`, and preload script reference in src/main/index.ts
-- [ ] T011 Create preload script — expose the full `ExperienceUIBridge` interface via `contextBridge.exposeInMainWorld('experienceUI', {...})` with typed stubs for all IPC domains (cli, auth, proxy, versions, plugins, app) and push notification listener registration per electron-ipc-channels.md in src/main/preload.ts
-- [ ] T012 Create React root mount with StrictMode and global error boundary in src/renderer/index.tsx
-- [ ] T013 [P] Set up design system — Tailwind CSS 4 config with CSS custom properties for spacing, typography, color (light/dark themes), border-radius tokens; global stylesheet with base reset and theme variables in src/renderer/styles/
-- [ ] T014 [P] Build common UI primitives — Button, IconButton, Modal, Dialog, StatusBadge, LoadingSpinner, ProgressBar, ErrorBoundary, EmptyState, Tooltip components using Radix UI primitives + Tailwind in src/renderer/components/common/
-- [ ] T015 Create minimal App shell component (placeholder layout, renders empty container) with Zustand app-level store for theme, chatPanelWidth, and consoleVisible in src/renderer/App.tsx and src/renderer/stores/app-store.ts
-- [ ] T016 [P] Create sample API spec test fixtures — valid OpenAPI 3.0 spec, valid Swagger 2.0 spec, valid GraphQL schema, invalid/malformed spec, empty spec (no endpoints), spec with external refs, large spec (50+ endpoints) in tests/fixtures/
+- [x] T007 Define all shared TypeScript types and interfaces from data-model.md in src/shared/types/ — APISpec, NormalizedSpec, NormalizedEndpoint, NormalizedOperation, NormalizedModel, SecurityScheme, SpecSource, SpecMetadata, ValidationError, GeneratedInterface, SandboxState, InterfaceVersion, APIConnection, AuthMethod, ConnectionStatus, CLIState, Plugin, Tab, ChatMessage, MessageAttachment, CustomizationRequest, ConsoleEntry, ConsoleRequest, ConsoleResponse, ApplicationState
+- [x] T008 [P] Define IPC channel name constants for all domains (cli, auth, proxy, versions, plugins, app) and push notification channel names per electron-ipc-channels.md contract in src/shared/ipc-channels.ts
+- [x] T009 [P] Define application constants (default split ratio 30/70, max chat panel width 85%, min 15%, max restart retries 5, request timeouts, CSP policy template, disallowed code patterns list, sandbox message type allowlists) in src/shared/constants.ts
+- [x] T010 Create Electron main process entry — BrowserWindow creation with `contextIsolation: true`, `nodeIntegration: false`, `sandbox: true`, and preload script reference in src/main/index.ts
+- [x] T011 Create preload script — expose the full `ExperienceUIBridge` interface via `contextBridge.exposeInMainWorld('experienceUI', {...})` with typed stubs for all IPC domains (cli, auth, proxy, versions, plugins, app) and push notification listener registration per electron-ipc-channels.md in src/main/preload.ts
+- [x] T012 Create React root mount with StrictMode and global error boundary in src/renderer/index.tsx
+- [x] T013 [P] Set up design system — Tailwind CSS 4 config with CSS custom properties for spacing, typography, color (light/dark themes), border-radius tokens; global stylesheet with base reset and theme variables in src/renderer/styles/
+- [x] T014 [P] Build common UI primitives — Button, IconButton, Modal, Dialog, StatusBadge, LoadingSpinner, ProgressBar, ErrorBoundary, EmptyState, Tooltip components using Radix UI primitives + Tailwind in src/renderer/components/common/
+- [x] T015 Create minimal App shell component (placeholder layout, renders empty container) with Zustand app-level store for theme, chatPanelWidth, and consoleVisible in src/renderer/App.tsx and src/renderer/stores/app-store.ts
+- [x] T016 [P] Create sample API spec test fixtures — valid OpenAPI 3.0 spec, valid Swagger 2.0 spec, valid GraphQL schema, invalid/malformed spec, empty spec (no endpoints), spec with external refs, large spec (50+ endpoints) in tests/fixtures/
 
 **Checkpoint**: Foundation ready — user story implementation can now begin
 
@@ -64,24 +64,24 @@
 
 > **NOTE: Write these tests FIRST, ensure they FAIL before implementation**
 
-- [ ] T017 [P] [US1] Write unit tests for CLI protocol JSON-RPC 2.0 encoding/decoding — request serialization, response parsing, stream chunk handling, error code mapping, notification handling in src/main/cli/cli-protocol.test.ts
-- [ ] T018 [P] [US1] Write unit tests for spec parser — format auto-detection (openapi field, swagger field, GraphQL type Query), OpenAPI 3.x parsing with $ref dereferencing, Swagger 2.0→3.x conversion, GraphQL schema parsing, validation error reporting, unsupported format rejection (RAML/WSDL), empty spec detection in src/renderer/services/spec-parser/spec-parser.test.ts
-- [ ] T019 [P] [US1] Write unit tests for code validator — detection of disallowed patterns (eval, Function(), document.cookie, window.parent, window.top, postMessage to non-host origins, require/import of Node modules), valid code pass-through, violation counting in src/renderer/services/code-validator/code-validator.test.ts
-- [ ] T020 [P] [US1] Write unit tests for sandbox postMessage bridge — nonce verification, message type allowlist filtering, INIT handshake, NETWORK_REQUEST proxying, READY echo, unknown message rejection in src/sandbox/bridge.test.ts
+- [x] T017 [P] [US1] Write unit tests for CLI protocol JSON-RPC 2.0 encoding/decoding — request serialization, response parsing, stream chunk handling, error code mapping, notification handling in src/main/cli/cli-protocol.test.ts
+- [x] T018 [P] [US1] Write unit tests for spec parser — format auto-detection (openapi field, swagger field, GraphQL type Query), OpenAPI 3.x parsing with $ref dereferencing, Swagger 2.0→3.x conversion, GraphQL schema parsing, validation error reporting, unsupported format rejection (RAML/WSDL), empty spec detection in src/renderer/services/spec-parser/spec-parser.test.ts
+- [x] T019 [P] [US1] Write unit tests for code validator — detection of disallowed patterns (eval, Function(), document.cookie, window.parent, window.top, postMessage to non-host origins, require/import of Node modules), valid code pass-through, violation counting in src/renderer/services/code-validator/code-validator.test.ts
+- [x] T020 [P] [US1] Write unit tests for sandbox postMessage bridge — nonce verification, message type allowlist filtering, INIT handshake, NETWORK_REQUEST proxying, READY echo, unknown message rejection in src/sandbox/bridge.test.ts
 
 ### Implementation for User Story 1
 
-- [ ] T021 [P] [US1] Implement CLI JSON-RPC 2.0 protocol encoder/decoder — request framing (newline-delimited), response parsing, stream chunk reassembly, error handling, notification support per cli-protocol.md contract in src/main/cli/cli-protocol.ts
-- [ ] T022 [US1] Implement CLI manager — spawn Copilot CLI via child_process.spawn(), stdin/stdout stream management, backpressure handling (drain events), crash detection (exit/error events), exponential backoff restart (5s→10s→30s), request timeout (30s), request queuing, environment variable whitelist, state machine (stopped→starting→running→crashed→restarting) per research.md R1 in src/main/cli/cli-manager.ts
-- [ ] T023 [US1] Register CLI IPC handlers — cli:send-message (forward to CLI, return response), cli:get-status (return CLIState), cli:restart (force restart), push notifications cli:status-changed and cli:stream-response in src/main/index.ts
-- [ ] T024 [US1] Register app domain IPC handlers — app:compile-code (invoke esbuild.transform with format iife, target es2020), app:validate-code (scan for disallowed patterns from constants.ts) in src/main/index.ts
-- [ ] T025 [P] [US1] Create CLI state Zustand store — status, pid, restartCount, pendingRequests, errorMessage; subscribe to cli:status-changed push notifications in src/renderer/stores/cli-store.ts
-- [ ] T026 [P] [US1] Create tab Zustand store (single-tab MVP) — one Tab with id, title, apiSpec, generatedInterface, chatHistory, customizationQueue; state transitions (empty→spec-loaded→generating→interface-ready) per data-model.md in src/renderer/stores/tab-store.ts
-- [ ] T027 [US1] Create useCli hook — sendMessage (with context), getStatus, restart, streaming response handling via cli:stream-response listener; exposes loading/error states in src/renderer/hooks/use-cli.ts
-- [ ] T028 [P] [US1] Implement OpenAPI 3.x parser — use @apidevtools/swagger-parser for validation and $ref dereferencing, transform to NormalizedSpec with endpoints[], models[], securitySchemes[], handle UnresolvedError for external refs by prompting user to provide them manually via a dialog per research.md R3 in src/renderer/services/spec-parser/openapi-parser.ts
-- [ ] T029 [P] [US1] Implement Swagger 2.0 parser — use swagger2openapi for 2.0→3.x conversion, then delegate to OpenAPI parser for normalization per research.md R3 in src/renderer/services/spec-parser/swagger-parser.ts
-- [ ] T030 [P] [US1] Implement GraphQL schema parser — use graphql package (buildSchema/introspectionFromSchema) + @graphql-tools/schema, transform to NormalizedSpec with queries[], mutations[], subscriptions[], models[] per research.md R3 in src/renderer/services/spec-parser/graphql-parser.ts
-- [ ] T031 [US1] Create spec parser facade — format auto-detection (check openapi field → 3.x, swagger field → 2.0, type Query/__schema → GraphQL), delegate to appropriate parser, return NormalizedSpec or validation errors, reject RAML/WSDL with supported-format suggestion in src/renderer/services/spec-parser/index.ts
+- [x] T021 [P] [US1] Implement CLI JSON-RPC 2.0 protocol encoder/decoder — request framing (newline-delimited), response parsing, stream chunk reassembly, error handling, notification support per cli-protocol.md contract in src/main/cli/cli-protocol.ts
+- [x] T022 [US1] Implement CLI manager — spawn Copilot CLI via child_process.spawn(), stdin/stdout stream management, backpressure handling (drain events), crash detection (exit/error events), exponential backoff restart (5s→10s→30s), request timeout (30s), request queuing, environment variable whitelist, state machine (stopped→starting→running→crashed→restarting) per research.md R1 in src/main/cli/cli-manager.ts
+- [x] T023 [US1] Register CLI IPC handlers — cli:send-message (forward to CLI, return response), cli:get-status (return CLIState), cli:restart (force restart), push notifications cli:status-changed and cli:stream-response in src/main/index.ts
+- [x] T024 [US1] Register app domain IPC handlers — app:compile-code (invoke esbuild.transform with format iife, target es2020), app:validate-code (scan for disallowed patterns from constants.ts) in src/main/index.ts
+- [x] T025 [P] [US1] Create CLI state Zustand store — status, pid, restartCount, pendingRequests, errorMessage; subscribe to cli:status-changed push notifications in src/renderer/stores/cli-store.ts
+- [x] T026 [P] [US1] Create tab Zustand store (single-tab MVP) — one Tab with id, title, apiSpec, generatedInterface, chatHistory, customizationQueue; state transitions (empty→spec-loaded→generating→interface-ready) per data-model.md in src/renderer/stores/tab-store.ts
+- [x] T027 [US1] Create useCli hook — sendMessage (with context), getStatus, restart, streaming response handling via cli:stream-response listener; exposes loading/error states in src/renderer/hooks/use-cli.ts
+- [x] T028 [P] [US1] Implement OpenAPI 3.x parser — use @apidevtools/swagger-parser for validation and $ref dereferencing, transform to NormalizedSpec with endpoints[], models[], securitySchemes[], handle UnresolvedError for external refs by prompting user to provide them manually via a dialog per research.md R3 in src/renderer/services/spec-parser/openapi-parser.ts
+- [x] T029 [P] [US1] Implement Swagger 2.0 parser — use swagger2openapi for 2.0→3.x conversion, then delegate to OpenAPI parser for normalization per research.md R3 in src/renderer/services/spec-parser/swagger-parser.ts
+- [x] T030 [P] [US1] Implement GraphQL schema parser — use graphql package (buildSchema/introspectionFromSchema) + @graphql-tools/schema, transform to NormalizedSpec with queries[], mutations[], subscriptions[], models[] per research.md R3 in src/renderer/services/spec-parser/graphql-parser.ts
+- [x] T031 [US1] Create spec parser facade — format auto-detection (check openapi field → 3.x, swagger field → 2.0, type Query/\_\_schema → GraphQL), delegate to appropriate parser, return NormalizedSpec or validation errors, reject RAML/WSDL with supported-format suggestion in src/renderer/services/spec-parser/index.ts
 - [ ] T032 [US1] Implement code validator/sanitizer — scan generated code string for disallowed patterns per FR-034 (eval, Function(), document.cookie, window.parent, window.top, postMessage to non-host origins, Node.js requires), return violations with severity and instance count in src/renderer/services/code-validator/index.ts
 - [ ] T033 [US1] Implement code generation orchestrator — coordinate full pipeline: accept NormalizedSpec → send CLI generate request → receive generated code (with streaming) → invoke app:validate-code IPC → invoke app:compile-code IPC → return compiled bundle or error in src/renderer/services/code-generator/index.ts
 - [ ] T034 [P] [US1] Create ChatPanel component — virtualized message list using @tanstack/virtual (variable-height items), auto-scroll to bottom on new messages, display user/assistant/system messages, progress indicator during generation in src/renderer/components/chat/ChatPanel.tsx

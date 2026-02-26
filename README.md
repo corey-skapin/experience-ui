@@ -63,31 +63,32 @@ The application uses three distinct processes with clear security boundaries:
 
 ### Security Boundaries
 
-| Boundary | Mechanism | Purpose |
-|----------|-----------|---------|
-| Main ↔ Renderer | Electron IPC via `contextBridge` | Isolate Node.js APIs from the UI process |
+| Boundary           | Mechanism                             | Purpose                                   |
+| ------------------ | ------------------------------------- | ----------------------------------------- |
+| Main ↔ Renderer    | Electron IPC via `contextBridge`      | Isolate Node.js APIs from the UI process  |
 | Renderer ↔ Sandbox | `postMessage` with nonce verification | Generated code cannot access the host app |
-| Host ↔ CLI | stdin/stdout JSON-RPC 2.0 | Managed subprocess with crash recovery |
+| Host ↔ CLI         | stdin/stdout JSON-RPC 2.0             | Managed subprocess with crash recovery    |
 
 Generated UIs are rendered inside sandboxed iframes with:
+
 - Strict CSP (`default-src 'none'`, nonce-based scripts)
 - No access to `window.parent`, `localStorage`, or the host filesystem
 - All network requests proxied through the main process
 
 ### Tech Stack
 
-| Layer | Technology |
-|-------|-----------|
-| Desktop shell | Electron 34 |
-| UI framework | React 19 |
-| Language | TypeScript 5.x (strict) |
-| State management | Zustand (5 domain stores) |
-| Styling | Tailwind CSS 4 + Radix UI primitives |
-| API parsing | swagger-parser, graphql |
-| Code bundling | esbuild (in-process compilation) |
-| Version storage | SQLite (better-sqlite3) + filesystem |
-| Credential storage | keytar (OS keychain) |
-| Testing | Vitest, React Testing Library, Playwright, axe-core |
+| Layer              | Technology                                          |
+| ------------------ | --------------------------------------------------- |
+| Desktop shell      | Electron 34                                         |
+| UI framework       | React 19                                            |
+| Language           | TypeScript 5.x (strict)                             |
+| State management   | Zustand (5 domain stores)                           |
+| Styling            | Tailwind CSS 4 + Radix UI primitives                |
+| API parsing        | swagger-parser, graphql                             |
+| Code bundling      | esbuild (in-process compilation)                    |
+| Version storage    | SQLite (better-sqlite3) + filesystem                |
+| Credential storage | keytar (OS keychain)                                |
+| Testing            | Vitest, React Testing Library, Playwright, axe-core |
 
 ### Project Structure
 
