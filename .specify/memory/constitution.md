@@ -1,50 +1,226 @@
-# [PROJECT_NAME] Constitution
-<!-- Example: Spec Constitution, TaskFlow Constitution, etc. -->
+<!--
+  Sync Impact Report
+  ==================
+  Version change: 1.1.0 → 1.2.0 (MINOR — new governance rule added)
+  Modified principles: None
+  Added sections: None (integrated into existing section)
+  Removed sections: None
+  Expanded sections:
+    - Development Workflow — added "Main branch protection" bullet
+      prohibiting direct pushes to main; all changes must go through
+      PRs; Copilot agents must not push without explicit owner approval
+  Templates requiring updates:
+    - None — workflow rules are process-level, not template-structural
+  Follow-up TODOs: None
+-->
+<!--
+  Sync Impact Report (prior)
+  ==================
+  Version change: 1.0.0 → 1.1.0 (MINOR — materially expanded guidance)
+  Modified principles:
+    - II. Testing Standards — added local-verification-before-commit
+      requirement (new bullet)
+  Added sections: None (integrated into existing sections)
+  Removed sections: None
+  Expanded sections:
+    - Development Workflow — added "Local verification gate" bullet
+      requiring all checks to pass locally before commit; recommends
+      pre-commit hooks (husky + lint-staged)
+    - Quality Gates table — added "Local pre-commit" row
+  Templates requiring updates:
+    - .specify/templates/plan-template.md        ✅ aligned
+    - .specify/templates/spec-template.md         ✅ aligned
+    - .specify/templates/tasks-template.md        ✅ aligned
+    - .specify/templates/checklist-template.md    ✅ aligned
+  Follow-up TODOs: None
+-->
+
+# Experience UI Constitution
 
 ## Core Principles
 
-### [PRINCIPLE_1_NAME]
-<!-- Example: I. Library-First -->
-[PRINCIPLE_1_DESCRIPTION]
-<!-- Example: Every feature starts as a standalone library; Libraries must be self-contained, independently testable, documented; Clear purpose required - no organizational-only libraries -->
+### I. Code Quality
 
-### [PRINCIPLE_2_NAME]
-<!-- Example: II. CLI Interface -->
-[PRINCIPLE_2_DESCRIPTION]
-<!-- Example: Every library exposes functionality via CLI; Text in/out protocol: stdin/args → stdout, errors → stderr; Support JSON + human-readable formats -->
+All code in this repository MUST be clean, maintainable, and
+consistently structured. This principle is non-negotiable and applies
+to every file committed.
 
-### [PRINCIPLE_3_NAME]
-<!-- Example: III. Test-First (NON-NEGOTIABLE) -->
-[PRINCIPLE_3_DESCRIPTION]
-<!-- Example: TDD mandatory: Tests written → User approved → Tests fail → Then implement; Red-Green-Refactor cycle strictly enforced -->
+- Every component, utility, and module MUST follow established project
+  conventions for naming, file organization, and code style.
+- Linting and formatting rules MUST be enforced automatically; no code
+  may be merged that violates configured lint rules.
+- Functions and components MUST have a single, clear responsibility.
+  Files exceeding 300 lines SHOULD be refactored into smaller units.
+- Shared logic MUST be extracted into reusable utilities or hooks
+  rather than duplicated across components.
+- All public APIs (exported functions, component props, utility
+  interfaces) MUST include TypeScript types with no use of `any`
+  except where explicitly justified with a code comment.
+- Dead code, unused imports, and commented-out blocks MUST be removed
+  before merge.
+- **Rationale**: A UI codebase grows rapidly. Without strict quality
+  discipline, technical debt compounds and velocity degrades. Automated
+  enforcement removes subjective debate from code review.
 
-### [PRINCIPLE_4_NAME]
-<!-- Example: IV. Integration Testing -->
-[PRINCIPLE_4_DESCRIPTION]
-<!-- Example: Focus areas requiring integration tests: New library contract tests, Contract changes, Inter-service communication, Shared schemas -->
+### II. Testing Standards
 
-### [PRINCIPLE_5_NAME]
-<!-- Example: V. Observability, VI. Versioning & Breaking Changes, VII. Simplicity -->
-[PRINCIPLE_5_DESCRIPTION]
-<!-- Example: Text I/O ensures debuggability; Structured logging required; Or: MAJOR.MINOR.BUILD format; Or: Start simple, YAGNI principles -->
+Comprehensive testing is mandatory. Every feature MUST be accompanied
+by tests that validate its behavior before it is considered complete.
 
-## [SECTION_2_NAME]
-<!-- Example: Additional Constraints, Security Requirements, Performance Standards, etc. -->
+- Unit tests MUST cover all business logic, utilities, hooks, and
+  non-trivial component behavior.
+- Integration tests MUST verify component composition, data flow
+  between parent and child components, and user interaction workflows.
+- Test-first development is the preferred approach: write failing tests
+  that describe expected behavior, then implement until tests pass
+  (Red-Green-Refactor).
+- Code coverage MUST NOT drop below the established project baseline.
+  New code SHOULD target ÔëÑ80% line coverage measured per feature
+  branch.
+- Tests MUST be deterministic: no reliance on network calls, timers,
+  or execution order. External dependencies MUST be mocked or stubbed.
+- Accessibility tests (e.g., axe-core integration) MUST be included
+  for all user-facing components.
+- Visual regression tests SHOULD be used for design-system components
+  where pixel-level consistency matters.
+- The full test suite, linter, and formatter MUST pass locally before
+  any change is committed or pushed. Developers MUST NOT push commits
+  that have not cleared all local quality checks. This is a hard
+  requirement, not a suggestionÔÇöCI exists as a safety net, not as the
+  primary quality gate.
+- **Rationale**: A UI without tests is a UI that breaks silently.
+  Testing is the primary mechanism for maintaining confidence during
+  refactoring and feature development. Enforcing local verification
+  prevents broken commits from reaching CI and blocking the team.
 
-[SECTION_2_CONTENT]
-<!-- Example: Technology stack requirements, compliance standards, deployment policies, etc. -->
+### III. User Experience Consistency
 
-## [SECTION_3_NAME]
-<!-- Example: Development Workflow, Review Process, Quality Gates, etc. -->
+Every screen, component, and interaction MUST adhere to the project's
+design system and accessibility standards. Consistency is a feature,
+not a preference.
 
-[SECTION_3_CONTENT]
-<!-- Example: Code review requirements, testing gates, deployment approval process, etc. -->
+- All UI components MUST use the project's design-system primitives
+  (tokens, spacing, typography, color) rather than hard-coded values.
+- Custom styling MUST only be introduced when the design system does
+  not provide a suitable primitive, and MUST be documented with
+  rationale.
+- Accessibility MUST meet WCAG 2.1 AA compliance as a minimum:
+  semantic HTML, ARIA attributes where needed, keyboard navigability,
+  and sufficient color contrast.
+- Interaction patterns (modals, forms, navigation, feedback) MUST
+  follow established UX conventions within the application; new
+  patterns MUST be reviewed and approved before implementation.
+- Responsive behavior MUST be tested across defined breakpoints.
+  Components MUST NOT break or become unusable at any supported
+  viewport size.
+- Error states, loading states, and empty states MUST be explicitly
+  designed and implemented for every data-driven component.
+- **Rationale**: Inconsistent UI erodes user trust and increases
+  cognitive load. Design-system adherence enables rapid development
+  while preserving visual and interaction coherence.
+
+### IV. Performance Requirements
+
+Performance is a feature. Every change MUST be evaluated against
+defined budgets and MUST NOT degrade the user experience.
+
+- Initial page load (Largest Contentful Paint) MUST remain under
+  2.5 seconds on a simulated mid-tier mobile device over 4G.
+- Total JavaScript bundle size for initial load MUST NOT exceed the
+  project-defined budget. Any increase exceeding 5 KB MUST be
+  justified in the PR description.
+- Components MUST avoid unnecessary re-renders. React components
+  SHOULD use memoization (`React.memo`, `useMemo`, `useCallback`)
+  when profiling demonstrates a measurable benefit.
+- Images and media MUST use lazy loading and appropriate modern
+  formats (WebP/AVIF with fallbacks).
+- Third-party dependencies MUST be evaluated for bundle-size impact
+  before adoption. Alternatives with smaller footprints MUST be
+  preferred when functionality is equivalent.
+- Performance regressions MUST be caught in CI via automated
+  lighthouse audits or equivalent tooling; PRs that exceed budget
+  thresholds MUST NOT be merged without explicit justification.
+- **Rationale**: Users abandon slow interfaces. Performance budgets
+  create accountability and prevent the gradual accumulation of
+  bloat that degrades experience over time.
+
+## Development Workflow
+
+The following workflow governs how changes move from idea to
+production in this repository.
+
+- **Branch strategy**: All work MUST occur on feature branches
+  created from the main branch. Branch names MUST follow the
+  convention `<issue-number>-<short-description>`.
+- **Commit discipline**: Commits MUST be atomic and descriptive.
+  Use conventional commit format (`feat:`, `fix:`, `refactor:`,
+  `test:`, `docs:`, `perf:`, `chore:`).
+- **Local verification gate**: All automated checks (test suite, lint,
+  type-check, formatting) MUST pass on the developer's local machine
+  before a commit is created. No commit may be pushed to a remote
+  branch without passing all local quality checks first. Projects
+  SHOULD configure pre-commit hooks (e.g., husky + lint-staged) to
+  enforce this automatically; manual verification is acceptable only
+  when hook tooling is impractical for the change type.
+- **Pull requests**: Every PR MUST reference the originating issue
+  or spec. PRs MUST include a description of what changed, why, and
+  how to verify. Screenshots or recordings MUST accompany visual
+  changes.
+- **Main branch protection**: Direct pushes to the `main` branch are
+  PROHIBITED. All changes to `main` MUST go through a pull request.
+  Copilot agents and automated tooling MUST NOT push to `main` without
+  explicit approval from the repository owner. When in doubt, ask
+  before pushing.
+- **Code review**: At least one approving review is required before
+  merge. Reviewers MUST verify compliance with all four Core
+  Principles.
+- **CI gates**: All automated checks (lint, type-check, test suite,
+  build, performance audit) MUST pass before a PR is eligible for
+  merge.
+
+## Quality Gates
+
+Quality gates define the minimum bar that every change MUST clear.
+
+| Gate | Requirement | Enforcement |
+|------|-------------|-------------|
+| Local pre-commit | Tests, lint, type-check, format all pass locally | Pre-commit hooks (husky + lint-staged) |
+| Lint | Zero errors, zero warnings | CI ÔÇö auto-block |
+| Type check | Strict mode, no suppressions without justification | CI ÔÇö auto-block |
+| Unit tests | All pass, coverage ÔëÑ baseline | CI ÔÇö auto-block |
+| Integration tests | All pass | CI ÔÇö auto-block |
+| Accessibility | axe-core: zero critical/serious violations | CI ÔÇö auto-block |
+| Bundle size | Within defined budget | CI ÔÇö warning/block |
+| Performance | LCP < 2.5 s, no regressions | CI ÔÇö warning |
+| Review | ÔëÑ 1 approval | GitHub branch protection |
 
 ## Governance
-<!-- Example: Constitution supersedes all other practices; Amendments require documentation, approval, migration plan -->
 
-[GOVERNANCE_RULES]
-<!-- Example: All PRs/reviews must verify compliance; Complexity must be justified; Use [GUIDANCE_FILE] for runtime development guidance -->
+This constitution is the supreme governance document for the
+experience-ui repository. It supersedes any conflicting practices,
+conventions, or ad-hoc agreements.
 
-**Version**: [CONSTITUTION_VERSION] | **Ratified**: [RATIFICATION_DATE] | **Last Amended**: [LAST_AMENDED_DATE]
-<!-- Example: Version: 2.1.1 | Ratified: 2025-06-13 | Last Amended: 2025-07-16 -->
+- **Supremacy**: In any conflict between this constitution and other
+  project documentation, this constitution prevails.
+- **Compliance verification**: All pull request reviews MUST include
+  an explicit check against the Core Principles. Reviewers SHOULD
+  reference the specific principle when requesting changes.
+- **Amendment procedure**: Amendments to this constitution require:
+  1. A written proposal describing the change and its rationale.
+  2. Review and approval by at least two maintainers.
+  3. A version bump following semantic versioning (see below).
+  4. A migration plan if the amendment changes existing constraints.
+- **Versioning policy**: Constitution versions follow MAJOR.MINOR.PATCH:
+  - MAJOR: Principle removal, redefinition, or backward-incompatible
+    governance change.
+  - MINOR: New principle or section added, or material expansion of
+    existing guidance.
+  - PATCH: Clarifications, wording fixes, non-semantic refinements.
+- **Compliance review**: At least once per quarter, the team SHOULD
+  audit recent PRs against this constitution to identify drift and
+  propose amendments if needed.
+- **Complexity justification**: Any deviation from these principles
+  MUST be documented with rationale in the relevant PR or spec and
+  tracked in the plan's Complexity Tracking table.
+
+**Version**: 1.2.0 | **Ratified**: 2026-02-26 | **Last Amended**: 2026-02-26
