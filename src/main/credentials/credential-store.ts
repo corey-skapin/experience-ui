@@ -48,6 +48,7 @@ interface StoredEntry {
 }
 
 const KEYCHAIN_SERVICE = 'experience-ui'
+const HEALTH_CHECK_INTERVAL_MS = 5 * 60 * 1000 // 5 minutes
 
 // ─── CredentialStore ───────────────────────────────────────────────────────
 
@@ -138,21 +139,23 @@ export class CredentialStore {
 
   // ─── Periodic health checks ───────────────────────────────────────────
 
+  /**
+   * Starts periodic health checks, removing expired entries and invoking the callback.
+   * The `reason` parameter is included for forward compatibility with future expiry reasons
+   * (e.g., 'revoked', 'invalid') even though only 'expired' is used today.
+   */
   startHealthChecks(onExpired: (baseUrl: string, reason: 'expired') => void): void {
     if (this.healthCheckInterval) return
-    this.healthCheckInterval = setInterval(
-      () => {
-        const now = Date.now()
-        for (const [baseUrl, entry] of this.entries.entries()) {
-          if (entry.expiresAt !== null && now >= entry.expiresAt) {
-            if (entry.timer) clearTimeout(entry.timer)
-            this.entries.delete(baseUrl)
-            onExpired(baseUrl, 'expired')
-          }
+    this.healthCheckInterval = setInterval(() => {
+      const now = Date.now()
+      for (const [baseUrl, entry] of this.entries.entries()) {
+        if (entry.expiresAt !== null && now >= entry.expiresAt) {
+          if (entry.timer) clearTimeout(entry.timer)
+          this.entries.delete(baseUrl)
+          onExpired(baseUrl, 'expired')
         }
-      },
-      5 * 60 * 1000,
-    ) // 5 minutes
+      }
+    }, HEALTH_CHECK_INTERVAL_MS)
     if (this.healthCheckInterval.unref) this.healthCheckInterval.unref()
   }
 

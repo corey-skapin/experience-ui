@@ -255,6 +255,7 @@ function createWindow(): void {
 app.whenReady().then(() => {
   registerIpcHandlers()
   setupCLINotifications()
+  createWindow()
   credentialStore.startHealthChecks((baseUrl) => {
     mainWindow?.webContents.send(AUTH_CHANNELS.TOKEN_EXPIRED, { baseUrl, reason: 'expired' })
     mainWindow?.webContents.send(AUTH_CHANNELS.CONNECTION_STATUS_CHANGED, {
@@ -262,7 +263,6 @@ app.whenReady().then(() => {
       status: 'expired',
     })
   })
-  createWindow()
 
   app.on('activate', () => {
     if (BrowserWindow.getAllWindows().length === 0) {
