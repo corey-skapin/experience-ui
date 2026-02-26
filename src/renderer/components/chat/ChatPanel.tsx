@@ -2,7 +2,8 @@
  * ChatPanel component.
  * Virtualized message list using @tanstack/react-virtual.
  * Auto-scrolls to bottom on new messages.
- * Shows user/assistant/system messages and generation progress.
+ * Shows user/assistant/system messages, generation progress, and
+ * an inline clarification prompt when the CLI needs user input.
  */
 import { useEffect, useRef, useCallback, type ReactElement } from 'react'
 import { useVirtualizer } from '@tanstack/react-virtual'
@@ -13,7 +14,13 @@ import { LoadingSpinner } from '../common/LoadingSpinner'
 import { ProgressBar } from '../common/ProgressBar'
 import { EmptyState } from '../common/EmptyState'
 
-// ─── Props ────────────────────────────────────────────────────────────────
+// ─── Types ────────────────────────────────────────────────────────────────
+
+export interface PendingClarification {
+  question: string
+  options: string[]
+  onSelect: (option: string) => void
+}
 
 interface ChatPanelProps {
   messages: ChatMessageType[]
@@ -26,6 +33,8 @@ interface ChatPanelProps {
   generationStage?: string
   disabled?: boolean
   queueDepth?: number
+  /** When set, shows a clarification prompt and disables the input. */
+  pendingClarification?: PendingClarification | null
 }
 
 // ─── Component ────────────────────────────────────────────────────────────
@@ -38,6 +47,7 @@ export function ChatPanel({
   generationStage,
   disabled = false,
   queueDepth = 0,
+  pendingClarification = null,
 }: ChatPanelProps): ReactElement {
   const parentRef = useRef<HTMLDivElement>(null)
   const isAtBottomRef = useRef(true)
@@ -64,6 +74,7 @@ export function ChatPanel({
   }, [])
 
   const virtualItems = rowVirtualizer.getVirtualItems()
+  const isInputDisabled = disabled || !!pendingClarification
 
   return (
     <div className="flex flex-col h-full bg-[var(--color-bg-primary)]" data-testid="chat-panel">
@@ -128,10 +139,34 @@ export function ChatPanel({
         )}
       </div>
 
+      {/* Clarification panel */}
+      {pendingClarification && (
+        <div
+          className="px-4 py-3 border-t border-[var(--color-border)] bg-[var(--color-bg-secondary)]"
+          data-testid="clarification-panel"
+        >
+          <p className="text-sm font-medium text-[var(--color-text-primary)] mb-2">
+            {pendingClarification.question}
+          </p>
+          <div className="flex flex-wrap gap-2">
+            {pendingClarification.options.map((option) => (
+              <button
+                key={option}
+                type="button"
+                onClick={() => pendingClarification.onSelect(option)}
+                className="px-3 py-1.5 text-sm rounded-lg border border-[var(--color-accent)] text-[var(--color-accent)] hover:bg-[var(--color-accent-muted)] transition-colors"
+              >
+                {option}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
       {/* Input */}
       <ChatInput
         onSend={onSendMessage}
-        disabled={disabled}
+        disabled={isInputDisabled}
         isLoading={isGenerating}
         queueDepth={queueDepth}
       />

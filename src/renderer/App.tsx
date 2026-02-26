@@ -1,7 +1,8 @@
 /**
  * Top-level App shell component.
  * Implements split-pane layout (30% chat / 70% content) using react-resizable-panels.
- * Wires the end-to-end flow: spec ingestion → parse → generate → compile → sandbox render.
+ * Wires the end-to-end flow: spec ingestion → parse → generate → compile → sandbox render,
+ * and the customization pipeline: chat → queue → CLI customize → sandbox update.
  */
 import { useEffect, useState, useCallback, type ReactElement } from 'react'
 import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels'
@@ -13,6 +14,7 @@ import { SandboxHost } from './components/sandbox/SandboxHost'
 import { ProgressBar } from './components/common/ProgressBar'
 import { parseSpec } from './services/spec-parser'
 import { generateInterface } from './services/code-generator'
+import { useCustomizationFlow } from './hooks/use-customization-flow'
 import { LAYOUT } from '../shared/constants'
 import type { APISpec, MessageAttachment } from '../shared/types'
 
@@ -49,6 +51,8 @@ export default function App(): ReactElement {
   const [generationProgress, setGenerationProgress] = useState(0)
   const [generationStage, setGenerationStage] = useState<string | undefined>()
   const [compiledCode, setCompiledCode] = useState<string | null>(null)
+
+  const { pendingClarification, handleCustomizationMessage } = useCustomizationFlow(compiledCode)
 
   // Apply theme class to document root
   useEffect(() => {
@@ -221,6 +225,12 @@ export default function App(): ReactElement {
         return
       }
 
+      // If an interface is already generated, treat as a customization request
+      if (tab.status === 'interface-ready' || tab.generatedInterface) {
+        await handleCustomizationMessage(trimmed)
+        return
+      }
+
       // Generic chat message
       addChatMessage('user', trimmed)
       addChatMessage(
@@ -229,7 +239,14 @@ export default function App(): ReactElement {
         { status: 'sent' },
       )
     },
-    [addChatMessage, updateChatMessage, handleSpecContent],
+    [
+      addChatMessage,
+      updateChatMessage,
+      handleSpecContent,
+      handleCustomizationMessage,
+      tab.status,
+      tab.generatedInterface,
+    ],
   )
 
   return (
@@ -256,6 +273,7 @@ export default function App(): ReactElement {
             generationProgress={generationProgress}
             generationStage={generationStage}
             queueDepth={tab.customizationQueue.filter((r) => r.status === 'queued').length}
+            pendingClarification={pendingClarification}
           />
         </Panel>
 

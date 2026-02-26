@@ -140,17 +140,17 @@
 
 > **NOTE: Write these tests FIRST, ensure they FAIL before implementation**
 
-- [ ] T057 [P] [US3] Write unit tests for customization queue — FIFO ordering, sequential processing (only one in-progress per tab), failed requests don't block subsequent, status transitions (queued→in-progress→completed/failed), queue depth limits in src/renderer/services/customization-queue.test.ts
+- [x] T057 [P] [US3] Write unit tests for customization queue — FIFO ordering, sequential processing (only one in-progress per tab), failed requests don't block subsequent, status transitions (queued→in-progress→completed/failed), queue depth limits in src/renderer/services/customization-queue.test.ts
 
 ### Implementation for User Story 3
 
-- [ ] T058 [US3] Implement customization request queue service — FIFO queue per tab, sequential processing (block new requests while in-flight per FR-012a), status tracking (queued/in-progress/completed/failed), failed request recovery, result version linking in src/renderer/services/customization-queue.ts
-- [ ] T059 [US3] Add customize method handling to useCli hook — send CLI customize request with currentCode, prompt, spec context, and chat history per cli-protocol.md; handle streaming response; handle clarification responses (clarificationNeeded: true) in src/renderer/hooks/use-cli.ts
-- [ ] T060 [US3] Update ChatPanel to display customization feedback — show confirmation of applied changes and assumptions made, display queued/pending status for waiting requests, render clarification questions with selectable options per FR-011/FR-012 in src/renderer/components/chat/ChatPanel.tsx
-- [ ] T061 [US3] Update ChatInput to show queue status — disable submit or show "queued" indicator when a customization is in-flight, display pending request count per FR-012a in src/renderer/components/chat/ChatInput.tsx
-- [ ] T062 [US3] Handle clarification flow — when CLI returns clarificationNeeded:true, display question and options in chat, wait for user selection, re-send customize request with user's choice per FR-012
-- [ ] T063 [US3] Wire customization pipeline end-to-end — chat input → queue request → CLI customize → receive updated code → compile (app:compile-code) → validate (app:validate-code) → update sandbox → update chat with confirmation; handle conflicts (e.g., "remove X" when X doesn't exist per edge case)
-- [ ] T064 [US3] Write integration test for customization flow — generate interface, request customization, verify sandbox updates, verify queue blocks concurrent requests, verify clarification handling in tests/integration/customization.test.tsx
+- [x] T058 [US3] Implement customization request queue service — FIFO queue per tab, sequential processing (block new requests while in-flight per FR-012a), status tracking (queued/in-progress/completed/failed), failed request recovery, result version linking in src/renderer/services/customization-queue.ts
+- [x] T059 [US3] Add customize method handling to useCli hook — send CLI customize request with currentCode, prompt, spec context, and chat history per cli-protocol.md; handle streaming response; handle clarification responses (clarificationNeeded: true) in src/renderer/hooks/use-cli.ts
+- [x] T060 [US3] Update ChatPanel to display customization feedback — show confirmation of applied changes and assumptions made, display queued/pending status for waiting requests, render clarification questions with selectable options per FR-011/FR-012 in src/renderer/components/chat/ChatPanel.tsx
+- [x] T061 [US3] Update ChatInput to show queue status — disable submit or show "queued" indicator when a customization is in-flight, display pending request count per FR-012a in src/renderer/components/chat/ChatInput.tsx
+- [x] T062 [US3] Handle clarification flow — when CLI returns clarificationNeeded:true, display question and options in chat, wait for user selection, re-send customize request with user's choice per FR-012
+- [x] T063 [US3] Wire customization pipeline end-to-end — chat input → queue request → CLI customize → receive updated code → compile (app:compile-code) → validate (app:validate-code) → update sandbox → update chat with confirmation; handle conflicts (e.g., "remove X" when X doesn't exist per edge case)
+- [x] T064 [US3] Write integration test for customization flow — generate interface, request customization, verify sandbox updates, verify queue blocks concurrent requests, verify clarification handling in tests/integration/customization.test.tsx
 
 **Checkpoint**: Users can modify generated interfaces using natural language. Requests are queued sequentially, clarifications are handled interactively, and changes appear in real time.
 

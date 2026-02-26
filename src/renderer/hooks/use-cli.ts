@@ -1,6 +1,6 @@
 /**
  * useCli hook.
- * Abstracts CLI IPC calls: sendMessage, getStatus, restart.
+ * Abstracts CLI IPC calls: sendMessage, getStatus, restart, customize.
  * Handles streaming responses via cli:stream-response listener.
  * Exposes loading and error states.
  */
@@ -10,6 +10,7 @@ import type {
   CLISendMessageResponse,
   CLIStreamResponseEvent,
 } from '../../shared/types/ipc'
+import type { NormalizedSpec, ChatMessage } from '../../shared/types'
 
 // ─── Types ────────────────────────────────────────────────────────────────
 
@@ -31,10 +32,45 @@ export interface CLIHookState {
   error: string | null
 }
 
+// ─── Customize result types ───────────────────────────────────────────────
+
+interface CustomizeSuccess {
+  success: true
+  clarificationNeeded: false
+  code: string
+  description: string
+  assumptions: string[]
+  requestId: string
+}
+
+interface CustomizeClarification {
+  success: true
+  clarificationNeeded: true
+  question: string
+  options: string[]
+  requestId: string
+}
+
+interface CustomizeFailure {
+  success: false
+  error: string
+  requestId: string
+}
+
+export type CustomizeResult = CustomizeSuccess | CustomizeClarification | CustomizeFailure
+
 export interface UseCliReturn extends CLIHookState {
   sendMessage: (message: string, options?: SendMessageOptions) => Promise<CLISendMessageResponse>
   getStatus: () => Promise<CLIStatusResponse>
   restart: () => Promise<{ success: boolean; error?: string }>
+  customize: (
+    tabId: string,
+    prompt: string,
+    currentCode: string,
+    specContext: NormalizedSpec | null,
+    chatHistory: ChatMessage[],
+    options?: { onChunk?: (chunk: string, requestId: string) => void },
+  ) => Promise<CustomizeResult>
 }
 
 // ─── Hook ─────────────────────────────────────────────────────────────────
@@ -132,8 +168,8 @@ export function useCli(): UseCliReturn {
 
         return response
       } catch (err) {
-        const message = err instanceof Error ? err.message : String(err)
-        setState((prev) => ({ ...prev, isLoading: false, error: message }))
+        const errMsg = err instanceof Error ? err.message : String(err)
+        setState((prev) => ({ ...prev, isLoading: false, error: errMsg }))
         throw err
       }
     },
@@ -153,5 +189,77 @@ export function useCli(): UseCliReturn {
     return bridge.cli.restart()
   }, [])
 
-  return { ...state, sendMessage, getStatus, restart }
+  const customize = useCallback(
+    async (
+      tabId: string,
+      prompt: string,
+      currentCode: string,
+      specContext: NormalizedSpec | null,
+      chatHistory: ChatMessage[],
+      options: { onChunk?: (chunk: string, requestId: string) => void } = {},
+    ): Promise<CustomizeResult> => {
+      const cliRequest = {
+        jsonrpc: '2.0',
+        method: 'customize',
+        params: {
+          currentCode,
+          prompt,
+          spec: specContext,
+          history: chatHistory.map((m) => ({ role: m.role, content: m.content })),
+        },
+      }
+
+      const response = await sendMessage(JSON.stringify(cliRequest), {
+        context: { tabId },
+        onChunk: options.onChunk,
+      })
+
+      if (!response.success || !response.response) {
+        return {
+          success: false,
+          error: response.error ?? 'Customize request failed with no response',
+          requestId: response.requestId,
+        }
+      }
+
+      try {
+        const result = JSON.parse(response.response) as {
+          code?: string | null
+          description?: string
+          assumptions?: string[]
+          clarificationNeeded?: boolean
+          question?: string
+          options?: string[]
+        }
+
+        if (result.clarificationNeeded) {
+          return {
+            success: true,
+            clarificationNeeded: true,
+            question: result.question ?? '',
+            options: result.options ?? [],
+            requestId: response.requestId,
+          }
+        }
+
+        return {
+          success: true,
+          clarificationNeeded: false,
+          code: result.code ?? '',
+          description: result.description ?? '',
+          assumptions: result.assumptions ?? [],
+          requestId: response.requestId,
+        }
+      } catch {
+        return {
+          success: false,
+          error: 'Invalid JSON response from CLI',
+          requestId: response.requestId,
+        }
+      }
+    },
+    [sendMessage],
+  )
+
+  return { ...state, sendMessage, getStatus, restart, customize }
 }
