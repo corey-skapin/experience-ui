@@ -41,11 +41,11 @@ function isRaml(raw: string): boolean {
 }
 
 function isWsdl(raw: string): boolean {
-  return (
-    raw.includes('definitions') &&
-    raw.includes('http://schemas.xmlsoap.org/wsdl/') &&
-    raw.trimStart().startsWith('<?xml')
-  );
+  const trimmed = raw.trimStart();
+  if (!trimmed.startsWith('<?xml')) return false;
+  // Look for WSDL definitions element with the standard namespace
+  const wsdlNamespacePattern = /xmlns(?::[a-z]+)?="http:\/\/schemas\.xmlsoap\.org\/wsdl\/"/;
+  return wsdlNamespacePattern.test(raw);
 }
 
 export async function parseSpec(raw: string): Promise<SpecParseResult> {
