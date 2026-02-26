@@ -1,74 +1,79 @@
 // src/renderer/stores/tab-store.ts
-// T026 — Zustand store for tab state (single-tab MVP).
-// Manages a single Tab with all fields from the data model.
-// State transitions: empty → spec-loaded → generating → interface-ready.
+// T078 — Multi-tab Zustand store.
+// Manages Tab[] with independent state per tab.
+// State transitions per tab: empty → spec-loaded → generating → interface-ready.
 
 import { create } from 'zustand';
 
-import type { APISpec, ChatMessage, CustomizationRequest, Tab } from '../../shared/types';
+import type {
+  APISpec,
+  ChatMessage,
+  ConsoleEntry,
+  CustomizationRequest,
+  Tab,
+} from '../../shared/types';
 
 // ─── Tab Status ───────────────────────────────────────────────────────────────
 
-/** Lifecycle status of the single MVP tab. */
 export type TabStatus = 'empty' | 'spec-loaded' | 'generating' | 'interface-ready';
+
+// ─── Close Result ─────────────────────────────────────────────────────────────
+
+export interface CloseTabResult {
+  removed: boolean;
+  requiresConfirmation?: boolean;
+  newActiveTabId?: string | null;
+}
 
 // ─── State Shape ──────────────────────────────────────────────────────────────
 
-interface TabStoreState {
-  /** The single active tab (created on store init). */
-  tab: Tab;
+export interface TabStoreState {
+  tabs: Tab[];
+  activeTabId: string | null;
+  /** Lifecycle status per tabId. */
+  tabStatuses: Record<string, TabStatus>;
+  /** Console entries per tabId (stored separately to keep Tab type clean). */
+  consoleEntries: Record<string, ConsoleEntry[]>;
 
-  /** High-level lifecycle status derived from tab content. */
-  tabStatus: TabStatus;
+  // ── Tab Management ─────────────────────────────────────────────────────────
+  createTab(): Tab;
+  closeTab(id: string): CloseTabResult;
+  closeTabForced(id: string): void;
+  switchTab(id: string): void;
+  renameTab(id: string, title: string): void;
+  reorderTab(id: string, newIndex: number): void;
+  getActiveTab(): Tab | undefined;
 
-  // ── Tab Actions ────────────────────────────────────────────────────────────
+  // ── Per-tab Spec / Status ──────────────────────────────────────────────────
+  loadSpec(tabId: string, spec: APISpec): void;
+  clearSpec(tabId: string): void;
+  startGenerating(tabId: string): void;
+  finishGenerating(tabId: string): void;
+  setTabStatus(tabId: string, status: TabStatus): void;
 
-  /** Load a parsed API spec into the tab. Transitions to 'spec-loaded'. */
-  loadSpec(spec: APISpec): void;
+  // ── Per-tab Chat ───────────────────────────────────────────────────────────
+  addChatMessage(tabId: string, message: ChatMessage): void;
+  updateChatMessage(tabId: string, id: string, update: Partial<ChatMessage>): void;
+  removeChatMessage(tabId: string, id: string): void;
 
-  /** Clear the spec and reset to 'empty'. */
-  clearSpec(): void;
+  // ── Per-tab Customization Queue ────────────────────────────────────────────
+  enqueueCustomization(tabId: string, request: CustomizationRequest): void;
+  updateCustomization(tabId: string, id: string, update: Partial<CustomizationRequest>): void;
+  dequeueCustomization(tabId: string, id: string): void;
 
-  /** Mark generation as in-progress. Transitions to 'generating'. */
-  startGenerating(): void;
-
-  /** Mark generation as complete. Transitions to 'interface-ready'. */
-  finishGenerating(): void;
-
-  /** Update tab title. */
-  setTitle(title: string): void;
-
-  // ── Chat Actions ───────────────────────────────────────────────────────────
-
-  /** Append a chat message to chatHistory. */
-  addChatMessage(message: ChatMessage): void;
-
-  /** Update an existing chat message by ID. */
-  updateChatMessage(id: string, update: Partial<ChatMessage>): void;
-
-  /** Remove a chat message by ID. */
-  removeChatMessage(id: string): void;
-
-  // ── Customization Queue Actions ────────────────────────────────────────────
-
-  /** Enqueue a customization request. */
-  enqueueCustomization(request: CustomizationRequest): void;
-
-  /** Update a customization request by ID. */
-  updateCustomization(id: string, update: Partial<CustomizationRequest>): void;
-
-  /** Remove a completed or failed customization request from the queue. */
-  dequeueCustomization(id: string): void;
+  // ── Per-tab Console ───────────────────────────────────────────────────────
+  addConsoleEntry(tabId: string, entry: ConsoleEntry): void;
+  clearConsoleEntries(tabId: string): void;
 }
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
-function createInitialTab(): Tab {
+function makeTab(displayOrder: number): Tab {
   return {
     id: crypto.randomUUID(),
     title: 'New Tab',
-    displayOrder: 0,
-    isActive: true,
+    displayOrder,
+    isActive: false,
     apiSpec: null,
     generatedInterface: null,
     connectionId: null,
@@ -78,110 +83,216 @@ function createInitialTab(): Tab {
   };
 }
 
-function deriveStatus(tab: Tab): TabStatus {
-  if (tab.generatedInterface !== null) return 'interface-ready';
-  if (tab.apiSpec !== null) return 'spec-loaded';
-  return 'empty';
+function updateTab(tabs: Tab[], id: string, patch: Partial<Tab>): Tab[] {
+  return tabs.map((t) => (t.id === id ? { ...t, ...patch } : t));
 }
 
-// ─── Store ────────────────────────────────────────────────────────────────────
+function pickNextActiveId(tabs: Tab[], removedId: string): string | null {
+  const rest = tabs.filter((t) => t.id !== removedId);
+  if (rest.length === 0) return null;
+  return [...rest].sort((a, b) => a.displayOrder - b.displayOrder)[0].id;
+}
 
-const initialTab = createInitialTab();
+function removeTabState(s: TabStoreState, id: string, nextId: string | null): Partial<TabStoreState> {
+  const { [id]: _s, ...tabStatuses } = s.tabStatuses;
+  const { [id]: _c, ...consoleEntries } = s.consoleEntries;
+  return { tabs: s.tabs.filter((t) => t.id !== id), activeTabId: nextId, tabStatuses, consoleEntries };
+}
+
+const _first = makeTab(0);
 
 export const useTabStore = create<TabStoreState>()((set, get) => ({
-  tab: initialTab,
-  tabStatus: 'empty',
+  tabs: [_first],
+  activeTabId: _first.id,
+  tabStatuses: { [_first.id]: 'empty' },
+  consoleEntries: {},
 
-  // ── Tab Actions ────────────────────────────────────────────────────────────
+  // ── Tab Management ─────────────────────────────────────────────────────────
 
-  loadSpec(spec: APISpec) {
+  createTab() {
+    const order = get().tabs.length;
+    const tab = makeTab(order);
+    set((s) => ({
+      tabs: [...s.tabs, tab],
+      activeTabId: tab.id,
+      tabStatuses: { ...s.tabStatuses, [tab.id]: 'empty' },
+    }));
+    return tab;
+  },
+
+  closeTab(id: string): CloseTabResult {
+    const tab = get().tabs.find((t) => t.id === id);
+    if (!tab) return { removed: false };
+    if (tab.apiSpec !== null) return { removed: false, requiresConfirmation: true };
+    const newActiveTabId = get().activeTabId === id ? pickNextActiveId(get().tabs, id) : get().activeTabId;
+    set((s) => removeTabState(s, id, newActiveTabId));
+    return { removed: true, newActiveTabId };
+  },
+
+  closeTabForced(id: string) {
+    const newActiveTabId = get().activeTabId === id ? pickNextActiveId(get().tabs, id) : get().activeTabId;
+    set((s) => removeTabState(s, id, newActiveTabId));
+  },
+
+  switchTab(id: string) {
+    set({ activeTabId: id });
+  },
+
+  renameTab(id: string, title: string) {
+    set((s) => ({ tabs: updateTab(s.tabs, id, { title }) }));
+  },
+
+  reorderTab(id: string, newIndex: number) {
+    set((s) => ({ tabs: updateTab(s.tabs, id, { displayOrder: newIndex }) }));
+  },
+
+  getActiveTab(): Tab | undefined {
+    const { tabs, activeTabId } = get();
+    return tabs.find((t) => t.id === activeTabId);
+  },
+
+  // ── Per-tab Spec / Status ──────────────────────────────────────────────────
+
+  loadSpec(tabId: string, spec: APISpec) {
+    set((s) => ({
+      tabs: updateTab(s.tabs, tabId, { apiSpec: spec, title: spec.metadata.title || 'Untitled' }),
+      tabStatuses: { ...s.tabStatuses, [tabId]: 'spec-loaded' },
+    }));
+  },
+
+  clearSpec(tabId: string) {
+    set((s) => ({
+      tabs: updateTab(s.tabs, tabId, { apiSpec: null, generatedInterface: null }),
+      tabStatuses: { ...s.tabStatuses, [tabId]: 'empty' },
+    }));
+  },
+
+  startGenerating(tabId: string) {
+    const tab = get().tabs.find((t) => t.id === tabId);
+    if (!tab?.apiSpec) return;
+    set((s) => ({ tabStatuses: { ...s.tabStatuses, [tabId]: 'generating' } }));
+  },
+
+  finishGenerating(tabId: string) {
+    set((s) => ({ tabStatuses: { ...s.tabStatuses, [tabId]: 'interface-ready' } }));
+  },
+
+  setTabStatus(tabId: string, status: TabStatus) {
+    set((s) => ({ tabStatuses: { ...s.tabStatuses, [tabId]: status } }));
+  },
+
+  // ── Per-tab Chat ───────────────────────────────────────────────────────────
+
+  addChatMessage(tabId: string, message: ChatMessage) {
+    set((s) => ({
+      tabs: updateTab(s.tabs, tabId, {
+        chatHistory: [...(s.tabs.find((t) => t.id === tabId)?.chatHistory ?? []), message],
+      }),
+    }));
+  },
+
+  updateChatMessage(tabId: string, id: string, update: Partial<ChatMessage>) {
     set((s) => {
-      const tab = { ...s.tab, apiSpec: spec, title: spec.metadata.title || 'Untitled' };
-      return { tab, tabStatus: deriveStatus(tab) };
+      const tab = s.tabs.find((t) => t.id === tabId);
+      if (!tab) return s;
+      return {
+        tabs: updateTab(s.tabs, tabId, {
+          chatHistory: tab.chatHistory.map((m) => (m.id === id ? { ...m, ...update } : m)),
+        }),
+      };
     });
   },
 
-  clearSpec() {
+  removeChatMessage(tabId: string, id: string) {
     set((s) => {
-      const tab = { ...s.tab, apiSpec: null, generatedInterface: null };
-      return { tab, tabStatus: 'empty' };
+      const tab = s.tabs.find((t) => t.id === tabId);
+      if (!tab) return s;
+      return {
+        tabs: updateTab(s.tabs, tabId, {
+          chatHistory: tab.chatHistory.filter((m) => m.id !== id),
+        }),
+      };
     });
   },
 
-  startGenerating() {
-    // Must have a spec loaded before generating
-    if (get().tab.apiSpec === null) return;
-    set({ tabStatus: 'generating' });
+  // ── Per-tab Customization Queue ────────────────────────────────────────────
+
+  enqueueCustomization(tabId: string, request: CustomizationRequest) {
+    set((s) => {
+      const tab = s.tabs.find((t) => t.id === tabId);
+      if (!tab) return s;
+      return {
+        tabs: updateTab(s.tabs, tabId, {
+          customizationQueue: [...tab.customizationQueue, request],
+        }),
+      };
+    });
   },
 
-  finishGenerating() {
-    set({ tabStatus: 'interface-ready' });
+  updateCustomization(tabId: string, id: string, update: Partial<CustomizationRequest>) {
+    set((s) => {
+      const tab = s.tabs.find((t) => t.id === tabId);
+      if (!tab) return s;
+      return {
+        tabs: updateTab(s.tabs, tabId, {
+          customizationQueue: tab.customizationQueue.map((r) =>
+            r.id === id ? { ...r, ...update } : r,
+          ),
+        }),
+      };
+    });
   },
 
-  setTitle(title: string) {
-    set((s) => ({ tab: { ...s.tab, title } }));
+  dequeueCustomization(tabId: string, id: string) {
+    set((s) => {
+      const tab = s.tabs.find((t) => t.id === tabId);
+      if (!tab) return s;
+      return {
+        tabs: updateTab(s.tabs, tabId, {
+          customizationQueue: tab.customizationQueue.filter((r) => r.id !== id),
+        }),
+      };
+    });
   },
 
-  // ── Chat Actions ───────────────────────────────────────────────────────────
+  // ── Per-tab Console ───────────────────────────────────────────────────────
 
-  addChatMessage(message: ChatMessage) {
+  addConsoleEntry(tabId: string, entry: ConsoleEntry) {
     set((s) => ({
-      tab: { ...s.tab, chatHistory: [...s.tab.chatHistory, message] },
-    }));
-  },
-
-  updateChatMessage(id: string, update: Partial<ChatMessage>) {
-    set((s) => ({
-      tab: {
-        ...s.tab,
-        chatHistory: s.tab.chatHistory.map((m) => (m.id === id ? { ...m, ...update } : m)),
+      consoleEntries: {
+        ...s.consoleEntries,
+        [tabId]: [...(s.consoleEntries[tabId] ?? []), entry],
       },
     }));
   },
 
-  removeChatMessage(id: string) {
-    set((s) => ({
-      tab: { ...s.tab, chatHistory: s.tab.chatHistory.filter((m) => m.id !== id) },
-    }));
-  },
-
-  // ── Customization Queue Actions ────────────────────────────────────────────
-
-  enqueueCustomization(request: CustomizationRequest) {
-    set((s) => ({
-      tab: {
-        ...s.tab,
-        customizationQueue: [...s.tab.customizationQueue, request],
-      },
-    }));
-  },
-
-  updateCustomization(id: string, update: Partial<CustomizationRequest>) {
-    set((s) => ({
-      tab: {
-        ...s.tab,
-        customizationQueue: s.tab.customizationQueue.map((r) =>
-          r.id === id ? { ...r, ...update } : r,
-        ),
-      },
-    }));
-  },
-
-  dequeueCustomization(id: string) {
-    set((s) => ({
-      tab: {
-        ...s.tab,
-        customizationQueue: s.tab.customizationQueue.filter((r) => r.id !== id),
-      },
-    }));
+  clearConsoleEntries(tabId: string) {
+    set((s) => ({ consoleEntries: { ...s.consoleEntries, [tabId]: [] } }));
   },
 }));
 
+// ─── Stable empty fallback ────────────────────────────────────────────────────
+
+const EMPTY_CONSOLE_ENTRIES: ConsoleEntry[] = [];
+
 // ─── Selectors ────────────────────────────────────────────────────────────────
 
-export const selectTab = (state: TabStoreState): Tab => state.tab;
-export const selectTabStatus = (state: TabStoreState): TabStatus => state.tabStatus;
-export const selectChatHistory = (state: TabStoreState): ChatMessage[] => state.tab.chatHistory;
-export const selectCustomizationQueue = (state: TabStoreState): CustomizationRequest[] =>
-  state.tab.customizationQueue;
-export const selectApiSpec = (state: TabStoreState): APISpec | null => state.tab.apiSpec;
+export const selectActiveTab = (s: TabStoreState): Tab | undefined =>
+  s.tabs.find((t) => t.id === s.activeTabId);
+
+export const selectTabs = (s: TabStoreState): Tab[] => s.tabs;
+
+export const selectTabById =
+  (id: string) =>
+  (s: TabStoreState): Tab | undefined =>
+    s.tabs.find((t) => t.id === id);
+
+export const selectConsoleEntries =
+  (tabId: string) =>
+  (s: TabStoreState): ConsoleEntry[] =>
+    s.consoleEntries[tabId] ?? EMPTY_CONSOLE_ENTRIES;
+
+export const selectActiveTabStatus = (s: TabStoreState): TabStatus => {
+  const active = s.tabs.find((t) => t.id === s.activeTabId);
+  return active ? (s.tabStatuses[active.id] ?? 'empty') : 'empty';
+};

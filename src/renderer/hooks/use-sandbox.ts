@@ -1,8 +1,12 @@
 // src/renderer/hooks/use-sandbox.ts
-// T039 — React hook for communicating with a sandboxed iframe.
-// Manages lifecycle (loading → ready), error reporting, and typed message routing.
+// T039/T091 — React hook for communicating with a sandboxed iframe.
+// Manages lifecycle (loading → ready), error reporting, typed message routing,
+// and console entry capture for proxy requests.
 
 import { type RefObject, useCallback, useEffect, useRef, useState } from 'react';
+
+import type { ConsoleEntry } from '../../shared/types';
+import { useTabStore } from '../stores/tab-store';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -39,6 +43,17 @@ export interface UseSandboxReturn {
    * Returns a cleanup function that removes the handler.
    */
   onSandboxMessage: (type: string, handler: (payload: unknown) => void) => () => void;
+  /**
+   * Send a proxy API request, capture a ConsoleEntry, and return the response.
+   */
+  sendProxyRequest: (
+    tabId: string,
+    baseUrl: string,
+    path: string,
+    method: string,
+    headers: Record<string, string>,
+    body?: string,
+  ) => Promise<{ status: number; statusText: string; headers: Record<string, string>; body: string; elapsedMs: number }>;
 }
 
 // ─── Hook ─────────────────────────────────────────────────────────────────────
@@ -75,6 +90,85 @@ export function useSandbox(iframeRef: RefObject<HTMLIFrameElement | null>): UseS
       return () => {
         handlersRef.current.delete(type);
       };
+    },
+    [],
+  );
+
+  // ── sendProxyRequest ───────────────────────────────────────────────────────
+  const sendProxyRequest = useCallback(
+    async (
+      tabId: string,
+      baseUrl: string,
+      path: string,
+      method: string,
+      headers: Record<string, string>,
+      body?: string,
+    ) => {
+      const entryId = crypto.randomUUID();
+      const startedAt = Date.now();
+      // Create pending entry
+      const pendingEntry: ConsoleEntry = {
+        id: entryId,
+        tabId,
+        timestamp: new Date().toISOString(),
+        request: { method, url: `${baseUrl}${path}`, headers, body },
+        response: null,
+        elapsedMs: null,
+        status: 'pending',
+      };
+      useTabStore.getState().addConsoleEntry(tabId, pendingEntry);
+
+      try {
+        const result = await window.experienceUI.proxy.apiRequest({
+          baseUrl,
+          path,
+          method,
+          headers,
+          body,
+        });
+        const elapsedMs = Date.now() - startedAt;
+        const completed: ConsoleEntry = {
+          ...pendingEntry,
+          response: {
+            statusCode: result.status,
+            statusText: result.statusText,
+            headers: result.headers,
+            body: result.body,
+            bodySize: result.body.length,
+          },
+          elapsedMs,
+          status: 'completed',
+        };
+        // Replace pending with completed (clear then add)
+        const current = useTabStore.getState().consoleEntries[tabId] ?? [];
+        useTabStore.setState((s) => ({
+          consoleEntries: {
+            ...s.consoleEntries,
+            [tabId]: current.map((e) => (e.id === entryId ? completed : e)),
+          },
+        }));
+        return {
+          status: result.status,
+          statusText: result.statusText,
+          headers: result.headers,
+          body: result.body,
+          elapsedMs,
+        };
+      } catch (err) {
+        const errorEntry: ConsoleEntry = {
+          ...pendingEntry,
+          elapsedMs: Date.now() - startedAt,
+          status: 'error',
+        };
+        const current = useTabStore.getState().consoleEntries[tabId] ?? [];
+        useTabStore.setState((s) => ({
+          consoleEntries: {
+            ...s.consoleEntries,
+            [tabId]: current.map((e) => (e.id === entryId ? errorEntry : e)),
+          },
+        }));
+        throw err;
+      }
     },
     [],
   );
@@ -127,5 +221,5 @@ export function useSandbox(iframeRef: RefObject<HTMLIFrameElement | null>): UseS
     };
   }, [iframeRef, nonce]);
 
-  return { isReady, isLoading, error, nonce, sendToSandbox, onSandboxMessage };
+  return { isReady, isLoading, error, nonce, sendToSandbox, onSandboxMessage, sendProxyRequest };
 }

@@ -123,20 +123,25 @@ beforeEach(() => {
   mockCliOnStatusChanged.mockReturnValue(vi.fn());
   mockCliOnStreamResponse.mockReturnValue(vi.fn());
 
+  const tabId = crypto.randomUUID();
   useTabStore.setState({
-    tab: {
-      id: crypto.randomUUID(),
-      title: 'New Tab',
-      displayOrder: 0,
-      isActive: true,
-      apiSpec: null,
-      generatedInterface: null,
-      connectionId: null,
-      chatHistory: [],
-      customizationQueue: [],
-      createdAt: new Date().toISOString(),
-    },
-    tabStatus: 'empty',
+    tabs: [
+      {
+        id: tabId,
+        title: 'New Tab',
+        displayOrder: 0,
+        isActive: true,
+        apiSpec: null,
+        generatedInterface: null,
+        connectionId: null,
+        chatHistory: [],
+        customizationQueue: [],
+        createdAt: new Date().toISOString(),
+      },
+    ],
+    activeTabId: tabId,
+    tabStatuses: { [tabId]: 'empty' as const },
+    consoleEntries: {},
   });
 });
 
@@ -184,7 +189,8 @@ describe('Spec ingestion — happy path', () => {
     await user.keyboard('{Enter}');
 
     await waitFor(() => {
-      expect(screen.getByText(/Petstore API/i)).toBeInTheDocument();
+      // Title appears in both tab bar and chat message - use getAllByText
+      expect(screen.getAllByText(/Petstore API/i).length).toBeGreaterThan(0);
     });
   });
 
@@ -196,7 +202,10 @@ describe('Spec ingestion — happy path', () => {
     await user.keyboard('{Enter}');
 
     await waitFor(() => {
-      expect(useTabStore.getState().tabStatus).toBe('interface-ready');
+      const state = useTabStore.getState();
+      const activeTabId = state.activeTabId;
+      expect(activeTabId).not.toBeNull();
+      expect(state.tabStatuses[activeTabId!]).toBe('interface-ready');
     });
   });
 });
@@ -257,11 +266,17 @@ describe('Spec ingestion — error paths', () => {
 
 describe('Zustand store state', () => {
   it('starts in empty tabStatus', () => {
-    expect(useTabStore.getState().tabStatus).toBe('empty');
+    const state = useTabStore.getState();
+    const activeTabId = state.activeTabId;
+    expect(activeTabId).not.toBeNull();
+    expect(state.tabStatuses[activeTabId!]).toBe('empty');
   });
 
   it('resets between tests', () => {
-    expect(useTabStore.getState().tabStatus).toBe('empty');
-    expect(useTabStore.getState().tab.chatHistory).toHaveLength(0);
+    const state = useTabStore.getState();
+    const activeTabId = state.activeTabId;
+    expect(activeTabId).not.toBeNull();
+    expect(state.tabStatuses[activeTabId!]).toBe('empty');
+    expect(state.getActiveTab()?.chatHistory).toHaveLength(0);
   });
 });

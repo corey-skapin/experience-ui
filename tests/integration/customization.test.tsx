@@ -166,7 +166,12 @@ beforeEach(() => {
     pageSize: 50,
   });
 
-  useTabStore.setState({ tab: SPEC_LOADED_TAB, tabStatus: 'interface-ready' });
+  useTabStore.setState({
+    tabs: [SPEC_LOADED_TAB],
+    activeTabId: SPEC_LOADED_TAB.id,
+    tabStatuses: { [SPEC_LOADED_TAB.id]: 'interface-ready' as const },
+    consoleEntries: {},
+  });
   useVersionStore.setState({ versions: {}, currentVersionId: {}, isLoading: false, error: null });
 });
 

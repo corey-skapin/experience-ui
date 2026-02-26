@@ -196,18 +196,18 @@
 
 > **NOTE: Write these tests FIRST, ensure they FAIL before implementation**
 
-- [ ] T077 [P] [US5] Write unit tests for multi-tab store — create tab, close tab, switch tab, rename tab, reorder tabs, tab state isolation (each tab has own spec/interface/chat), activeTabId management, close confirmation trigger in src/renderer/stores/tab-store.test.ts
+- [x] T077 [P] [US5] Write unit tests for multi-tab store — create tab, close tab, switch tab, rename tab, reorder tabs, tab state isolation (each tab has own spec/interface/chat), activeTabId management, close confirmation trigger in src/renderer/stores/tab-store.test.ts
 
 ### Implementation for User Story 5
 
-- [ ] T078 [US5] Upgrade tab store to full multi-tab support — Tab[] array, activeTabId, createTab, closeTab, switchTab, renameTab, reorderTab, per-tab state isolation (apiSpec, generatedInterface, chatHistory, customizationQueue, consoleEntries are independent per tab) in src/renderer/stores/tab-store.ts
-- [ ] T079 [US5] Create useTabs hook — createTab, closeTab (with unsaved-work check), switchTab, renameTab, reorderTab, getActiveTab, tabCount; expose tab list and active tab state in src/renderer/hooks/use-tabs.ts
-- [ ] T080 [P] [US5] Create TabBar component — horizontal tab strip with overflow scroll, tab indicators (active/inactive), "+" new tab button, close button per tab, @dnd-kit/core drag reorder, double-click to rename in src/renderer/components/tabs/TabBar.tsx
-- [ ] T081 [P] [US5] Create TabItem component — tab label with truncation, close button, active/inactive styling, drag handle, rename inline editing, unsaved indicator in src/renderer/components/tabs/TabItem.tsx
-- [ ] T082 [US5] Implement tab close with confirmation — when closing a tab with a loaded spec or customized interface, show confirmation dialog before discarding state per acceptance scenario 3 in src/renderer/components/tabs/TabBar.tsx
-- [ ] T083 [US5] Wire per-tab state isolation in App.tsx — render the active tab's ChatPanel, SandboxHost, and version history; switching tabs swaps all panel content while preserving each tab's independent state
-- [ ] T084 [US5] Implement per-base-URL credential sharing — when two tabs connect to the same API base URL, auth-store shares one APIConnection; re-authenticating in one tab updates all tabs using that base URL per FR-020 and data-model.md APIConnection.tabIds in src/renderer/stores/auth-store.ts
-- [ ] T085 [US5] Write integration test for multi-tab — create 3 tabs with different specs, customize each, switch between, verify state isolation; connect 2 tabs to same base URL, verify shared credentials; close tab with confirmation in tests/integration/multi-tab.test.tsx
+- [x] T078 [US5] Upgrade tab store to full multi-tab support — Tab[] array, activeTabId, createTab, closeTab, switchTab, renameTab, reorderTab, per-tab state isolation (apiSpec, generatedInterface, chatHistory, customizationQueue, consoleEntries are independent per tab) in src/renderer/stores/tab-store.ts
+- [x] T079 [US5] Create useTabs hook — createTab, closeTab (with unsaved-work check), switchTab, renameTab, reorderTab, getActiveTab, tabCount; expose tab list and active tab state in src/renderer/hooks/use-tabs.ts
+- [x] T080 [P] [US5] Create TabBar component — horizontal tab strip with overflow scroll, tab indicators (active/inactive), "+" new tab button, close button per tab, @dnd-kit/core drag reorder, double-click to rename in src/renderer/components/tabs/TabBar.tsx
+- [x] T081 [P] [US5] Create TabItem component — tab label with truncation, close button, active/inactive styling, drag handle, rename inline editing, unsaved indicator in src/renderer/components/tabs/TabItem.tsx
+- [x] T082 [US5] Implement tab close with confirmation — when closing a tab with a loaded spec or customized interface, show confirmation dialog before discarding state per acceptance scenario 3 in src/renderer/components/tabs/TabBar.tsx
+- [x] T083 [US5] Wire per-tab state isolation in App.tsx — render the active tab's ChatPanel, SandboxHost, and version history; switching tabs swaps all panel content while preserving each tab's independent state
+- [x] T084 [US5] Implement per-base-URL credential sharing — when two tabs connect to the same API base URL, auth-store shares one APIConnection; re-authenticating in one tab updates all tabs using that base URL per FR-020 and data-model.md APIConnection.tabIds in src/renderer/stores/auth-store.ts
+- [x] T085 [US5] Write integration test for multi-tab — create 3 tabs with different specs, customize each, switch between, verify state isolation; connect 2 tabs to same base URL, verify shared credentials; close tab with confirmation in tests/integration/multi-tab.test.tsx
 
 **Checkpoint**: Multi-tab support working. Each tab is fully independent. Credential sharing works per base URL. 10+ tabs remain responsive (tab switch < 200ms per performance goals).
 
@@ -223,17 +223,17 @@
 
 > **NOTE: Write these tests FIRST, ensure they FAIL before implementation**
 
-- [ ] T086 [P] [US6] Write unit tests for console filtering — filter by status code, filter by URL pattern, keyword search across request/response body, combined filters, clear all entries in src/renderer/components/console/console-filter.test.ts
+- [x] T086 [P] [US6] Write unit tests for console filtering — filter by status code, filter by URL pattern, keyword search across request/response body, combined filters, clear all entries in src/renderer/components/console/console-filter.test.ts
 
 ### Implementation for User Story 6
 
-- [ ] T087 [US6] Extend tab store with console entries — add ConsoleEntry[] per tab, add/clear operations, capture entry from proxy response data in src/renderer/stores/tab-store.ts
-- [ ] T088 [P] [US6] Create ConsolePanel component — toggleable panel (bottom of content area), virtual-scrolled entry list using @tanstack/virtual (fixed-height entries), search input, status code filter dropdown, URL pattern filter, "Clear" button, entry count indicator in src/renderer/components/console/ConsolePanel.tsx
-- [ ] T089 [P] [US6] Create ConsoleEntry component — display HTTP method badge, URL, status code (color-coded), elapsed time, expandable sections for request headers/body and response headers/body with highlight.js syntax highlighting for JSON in src/renderer/components/console/ConsoleEntry.tsx
-- [ ] T090 [US6] Implement console filtering logic — filter by status code range (2xx, 3xx, 4xx, 5xx), filter by URL pattern (substring/regex), keyword search across method+URL+body via useMemo + regex, combined filter AND logic in src/renderer/components/console/use-console-filter.ts
-- [ ] T091 [US6] Wire console entry capture — intercept all proxy:api-request IPC responses and create ConsoleEntry records, capture sandbox LOG messages via postMessage bridge, record elapsed time per request in src/renderer/hooks/use-sandbox.ts and src/renderer/hooks/use-auth.ts
-- [ ] T092 [US6] Integrate console panel into App layout — add toggleable bottom panel (consoleVisible from app-store), keyboard shortcut to toggle (Ctrl/Cmd+J), per-tab console entries display in src/renderer/App.tsx
-- [ ] T093 [US6] Write integration test for debug console — mock API requests, verify console entries appear with correct method/URL/status/timing, verify filtering works, verify clear removes all entries in tests/integration/debug-console.test.tsx
+- [x] T087 [US6] Extend tab store with console entries — add ConsoleEntry[] per tab, add/clear operations, capture entry from proxy response data in src/renderer/stores/tab-store.ts
+- [x] T088 [P] [US6] Create ConsolePanel component — toggleable panel (bottom of content area), virtual-scrolled entry list using @tanstack/virtual (fixed-height entries), search input, status code filter dropdown, URL pattern filter, "Clear" button, entry count indicator in src/renderer/components/console/ConsolePanel.tsx
+- [x] T089 [P] [US6] Create ConsoleEntry component — display HTTP method badge, URL, status code (color-coded), elapsed time, expandable sections for request headers/body and response headers/body with highlight.js syntax highlighting for JSON in src/renderer/components/console/ConsoleEntry.tsx
+- [x] T090 [US6] Implement console filtering logic — filter by status code range (2xx, 3xx, 4xx, 5xx), filter by URL pattern (substring/regex), keyword search across method+URL+body via useMemo + regex, combined filter AND logic in src/renderer/components/console/use-console-filter.ts
+- [x] T091 [US6] Wire console entry capture — intercept all proxy:api-request IPC responses and create ConsoleEntry records, capture sandbox LOG messages via postMessage bridge, record elapsed time per request in src/renderer/hooks/use-sandbox.ts and src/renderer/hooks/use-auth.ts
+- [x] T092 [US6] Integrate console panel into App layout — add toggleable bottom panel (consoleVisible from app-store), keyboard shortcut to toggle (Ctrl/Cmd+J), per-tab console entries display in src/renderer/App.tsx
+- [x] T093 [US6] Write integration test for debug console — mock API requests, verify console entries appear with correct method/URL/status/timing, verify filtering works, verify clear removes all entries in tests/integration/debug-console.test.tsx
 
 **Checkpoint**: Debug console panel working. All API requests are logged with full request/response detail. Filtering and search work. Console operates per-tab independently.
 

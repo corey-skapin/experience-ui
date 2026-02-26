@@ -143,19 +143,23 @@ beforeEach(() => {
   });
 
   useTabStore.setState({
-    tab: {
-      id: 'tab-1',
-      title: 'New Tab',
-      displayOrder: 0,
-      isActive: true,
-      apiSpec: null,
-      generatedInterface: null,
-      connectionId: null,
-      chatHistory: [],
-      customizationQueue: [],
-      createdAt: new Date().toISOString(),
-    },
-    tabStatus: 'empty',
+    tabs: [
+      {
+        id: 'tab-1',
+        title: 'New Tab',
+        displayOrder: 0,
+        isActive: true,
+        apiSpec: null,
+        generatedInterface: null,
+        connectionId: null,
+        chatHistory: [],
+        customizationQueue: [],
+        createdAt: new Date().toISOString(),
+      },
+    ],
+    activeTabId: 'tab-1',
+    tabStatuses: { 'tab-1': 'empty' as const },
+    consoleEntries: {},
   });
   useVersionStore.setState({ versions: {}, currentVersionId: {}, isLoading: false, error: null });
 });
