@@ -64,10 +64,10 @@
 
 > **NOTE: Write these tests FIRST, ensure they FAIL before implementation**
 
-- [ ] T017 [P] [US1] Write unit tests for CLI protocol JSON-RPC 2.0 encoding/decoding — request serialization, response parsing, stream chunk handling, error code mapping, notification handling in src/main/cli/cli-protocol.test.ts
-- [ ] T018 [P] [US1] Write unit tests for spec parser — format auto-detection (openapi field, swagger field, GraphQL type Query), OpenAPI 3.x parsing with $ref dereferencing, Swagger 2.0→3.x conversion, GraphQL schema parsing, validation error reporting, unsupported format rejection (RAML/WSDL), empty spec detection in src/renderer/services/spec-parser/spec-parser.test.ts
-- [ ] T019 [P] [US1] Write unit tests for code validator — detection of disallowed patterns (eval, Function(), document.cookie, window.parent, window.top, postMessage to non-host origins, require/import of Node modules), valid code pass-through, violation counting in src/renderer/services/code-validator/code-validator.test.ts
-- [ ] T020 [P] [US1] Write unit tests for sandbox postMessage bridge — nonce verification, message type allowlist filtering, INIT handshake, NETWORK_REQUEST proxying, READY echo, unknown message rejection in src/sandbox/bridge.test.ts
+- [X] T017 [P] [US1] Write unit tests for CLI protocol JSON-RPC 2.0 encoding/decoding — request serialization, response parsing, stream chunk handling, error code mapping, notification handling in src/main/cli/cli-protocol.test.ts
+- [X] T018 [P] [US1] Write unit tests for spec parser — format auto-detection (openapi field, swagger field, GraphQL type Query), OpenAPI 3.x parsing with $ref dereferencing, Swagger 2.0→3.x conversion, GraphQL schema parsing, validation error reporting, unsupported format rejection (RAML/WSDL), empty spec detection in src/renderer/services/spec-parser/spec-parser.test.ts
+- [X] T019 [P] [US1] Write unit tests for code validator — detection of disallowed patterns (eval, Function(), document.cookie, window.parent, window.top, postMessage to non-host origins, require/import of Node modules), valid code pass-through, violation counting in src/renderer/services/code-validator/code-validator.test.ts
+- [X] T020 [P] [US1] Write unit tests for sandbox postMessage bridge — nonce verification, message type allowlist filtering, INIT handshake, NETWORK_REQUEST proxying, READY echo, unknown message rejection in src/sandbox/bridge.test.ts
 
 ### Implementation for User Story 1
 
