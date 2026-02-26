@@ -141,10 +141,10 @@ export class CredentialStore {
 
   /**
    * Starts periodic health checks, removing expired entries and invoking the callback.
-   * The `reason` parameter is included for forward compatibility with future expiry reasons
-   * (e.g., 'revoked', 'invalid') even though only 'expired' is used today.
    */
-  startHealthChecks(onExpired: (baseUrl: string, reason: 'expired') => void): void {
+  startHealthChecks(
+    onExpired: (baseUrl: string, reason: 'expired' | 'revoked' | 'invalid') => void,
+  ): void {
     if (this.healthCheckInterval) return
     this.healthCheckInterval = setInterval(() => {
       const now = Date.now()

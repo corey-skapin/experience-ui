@@ -280,8 +280,6 @@ export function AuthSetupFlow({
           </div>
         </div>
       )}
-
-      {/* No-op: Button handles its own loading spinner */}
     </div>
   )
 }
