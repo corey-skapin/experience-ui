@@ -6,10 +6,19 @@
 import { app, BrowserWindow, shell, ipcMain } from 'electron'
 import { join } from 'path'
 import { transform } from 'esbuild'
-import { CLI_CHANNELS, APP_CHANNELS, PROXY_CHANNELS } from '../shared/ipc-channels'
+import { CLI_CHANNELS, APP_CHANNELS, PROXY_CHANNELS, AUTH_CHANNELS } from '../shared/ipc-channels'
 import { ESBUILD, DISALLOWED_CODE_PATTERNS } from '../shared/constants'
 import { CLIManager } from './cli/cli-manager'
 import { handleProxyRequest } from './proxy/api-proxy'
+import { CredentialStore } from './credentials/credential-store'
+import type { KeytarProvider, KeytarLike, RawCredential } from './credentials/credential-store'
+import { registerOAuthHandler } from './credentials/oauth-flow'
+import type {
+  AuthConfigureRequest,
+  AuthTestRequest,
+  AuthStatusRequest,
+  AuthClearRequest,
+} from '../shared/types/ipc'
 
 const isDev = process.env.NODE_ENV === 'development'
 
@@ -23,6 +32,13 @@ const cliPath = isDev
   : join(process.resourcesPath, 'cli/copilot-cli')
 
 const cliManager = new CLIManager(cliPath)
+
+// ─── Credential store ──────────────────────────────────────────────────────
+
+const keytarProvider: KeytarProvider = async () => {
+  return require('keytar') as KeytarLike
+}
+export const credentialStore = new CredentialStore(keytarProvider)
 
 // ─── Code validator (inline, main-process copy) ───────────────────────────
 
@@ -118,8 +134,75 @@ function registerIpcHandlers(): void {
   // ── Proxy handler (T040) ───────────────────────────────────────────────
 
   ipcMain.handle(PROXY_CHANNELS.API_REQUEST, async (_event, req) => {
-    return handleProxyRequest(req as Parameters<typeof handleProxyRequest>[0])
+    return handleProxyRequest(req as Parameters<typeof handleProxyRequest>[0], credentialStore)
   })
+
+  // ── Auth handlers (T047) ───────────────────────────────────────────────
+
+  ipcMain.handle(AUTH_CHANNELS.CONFIGURE, async (_event, req: AuthConfigureRequest) => {
+    try {
+      const { baseUrl, method, persist } = req
+      let rawCredential: RawCredential
+
+      if (method.type === 'apiKey') {
+        rawCredential = { type: 'apiKey', headerName: method.headerName, key: method.key }
+      } else if (method.type === 'bearer') {
+        rawCredential = { type: 'bearer', token: method.token }
+      } else {
+        rawCredential = { type: 'oauth2', accessToken: '' }
+      }
+
+      const connectionId = credentialStore.setCredentials(baseUrl, rawCredential, { persist })
+      return { success: true, connectionId }
+    } catch (err) {
+      return {
+        success: false,
+        connectionId: '',
+        error: err instanceof Error ? err.message : String(err),
+      }
+    }
+  })
+
+  ipcMain.handle(AUTH_CHANNELS.TEST_CONNECTION, async (_event, req: AuthTestRequest) => {
+    const startTime = Date.now()
+    const url = `${req.baseUrl}${req.healthCheckPath ?? '/'}`
+    try {
+      const headers = credentialStore.getAuthHeaders(req.baseUrl)
+      const response = await fetch(url, {
+        method: 'GET',
+        headers,
+        signal: AbortSignal.timeout(10_000),
+      })
+      const responseTimeMs = Date.now() - startTime
+      if (response.status === 401 || response.status === 403) {
+        return { status: 'unauthorized', responseTimeMs, statusCode: response.status }
+      }
+      if (response.ok) {
+        return { status: 'connected', responseTimeMs, statusCode: response.status }
+      }
+      return { status: 'degraded', responseTimeMs, statusCode: response.status }
+    } catch {
+      return { status: 'unreachable', responseTimeMs: Date.now() - startTime }
+    }
+  })
+
+  ipcMain.handle(AUTH_CHANNELS.GET_CONNECTION_STATUS, (_event, req: AuthStatusRequest) => {
+    const configured = credentialStore.hasCredentials(req.baseUrl)
+    return {
+      configured,
+      status: configured ? 'connected' : 'disconnected',
+      authMethod: 'none',
+      lastVerifiedAt: null,
+      responseTimeMs: null,
+    }
+  })
+
+  ipcMain.handle(AUTH_CHANNELS.CLEAR_CREDENTIALS, (_event, req: AuthClearRequest) => {
+    credentialStore.clearCredentials(req.baseUrl, { clearPersisted: req.clearPersisted })
+    return { success: true }
+  })
+
+  registerOAuthHandler(credentialStore)
 }
 
 // ─── CLI event forwarding ──────────────────────────────────────────────────
@@ -172,6 +255,13 @@ function createWindow(): void {
 app.whenReady().then(() => {
   registerIpcHandlers()
   setupCLINotifications()
+  credentialStore.startHealthChecks((baseUrl) => {
+    mainWindow?.webContents.send(AUTH_CHANNELS.TOKEN_EXPIRED, { baseUrl, reason: 'expired' })
+    mainWindow?.webContents.send(AUTH_CHANNELS.CONNECTION_STATUS_CHANGED, {
+      baseUrl,
+      status: 'expired',
+    })
+  })
   createWindow()
 
   app.on('activate', () => {
