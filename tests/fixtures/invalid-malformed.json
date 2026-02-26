@@ -1,0 +1,7 @@
+{
+  "this is not": "a valid spec",
+  "missing": "required fields",
+  "info": null,
+  "paths": "should be an object not a string",
+  "openapi": 123
+}

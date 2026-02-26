@@ -1,0 +1,155 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Large API",
+    "version": "1.0.0",
+    "description": "An API spec with 50+ endpoints for testing"
+  },
+  "servers": [{ "url": "https://api.example.com/v1" }],
+  "paths": {
+    "/users": {
+      "get": { "operationId": "listUsers", "summary": "List users", "tags": ["users"], "parameters": [], "responses": { "200": { "description": "OK" } } },
+      "post": { "operationId": "createUser", "summary": "Create user", "tags": ["users"], "parameters": [], "responses": { "201": { "description": "Created" } } }
+    },
+    "/users/{id}": {
+      "get": { "operationId": "getUser", "summary": "Get user", "tags": ["users"], "parameters": [{"name":"id","in":"path","required":true,"schema":{"type":"string"}}], "responses": { "200": { "description": "OK" } } },
+      "put": { "operationId": "updateUser", "summary": "Update user", "tags": ["users"], "parameters": [{"name":"id","in":"path","required":true,"schema":{"type":"string"}}], "responses": { "200": { "description": "OK" } } },
+      "delete": { "operationId": "deleteUser", "summary": "Delete user", "tags": ["users"], "parameters": [{"name":"id","in":"path","required":true,"schema":{"type":"string"}}], "responses": { "204": { "description": "No Content" } } },
+      "patch": { "operationId": "patchUser", "summary": "Patch user", "tags": ["users"], "parameters": [{"name":"id","in":"path","required":true,"schema":{"type":"string"}}], "responses": { "200": { "description": "OK" } } }
+    },
+    "/products": {
+      "get": { "operationId": "listProducts", "summary": "List products", "tags": ["products"], "parameters": [], "responses": { "200": { "description": "OK" } } },
+      "post": { "operationId": "createProduct", "summary": "Create product", "tags": ["products"], "parameters": [], "responses": { "201": { "description": "Created" } } }
+    },
+    "/products/{id}": {
+      "get": { "operationId": "getProduct", "summary": "Get product", "tags": ["products"], "parameters": [{"name":"id","in":"path","required":true,"schema":{"type":"string"}}], "responses": { "200": { "description": "OK" } } },
+      "put": { "operationId": "updateProduct", "summary": "Update product", "tags": ["products"], "parameters": [{"name":"id","in":"path","required":true,"schema":{"type":"string"}}], "responses": { "200": { "description": "OK" } } },
+      "delete": { "operationId": "deleteProduct", "summary": "Delete product", "tags": ["products"], "parameters": [{"name":"id","in":"path","required":true,"schema":{"type":"string"}}], "responses": { "204": { "description": "No Content" } } }
+    },
+    "/orders": {
+      "get": { "operationId": "listOrders", "summary": "List orders", "tags": ["orders"], "parameters": [], "responses": { "200": { "description": "OK" } } },
+      "post": { "operationId": "createOrder", "summary": "Create order", "tags": ["orders"], "parameters": [], "responses": { "201": { "description": "Created" } } }
+    },
+    "/orders/{id}": {
+      "get": { "operationId": "getOrder", "summary": "Get order", "tags": ["orders"], "parameters": [{"name":"id","in":"path","required":true,"schema":{"type":"string"}}], "responses": { "200": { "description": "OK" } } },
+      "put": { "operationId": "updateOrder", "summary": "Update order", "tags": ["orders"], "parameters": [{"name":"id","in":"path","required":true,"schema":{"type":"string"}}], "responses": { "200": { "description": "OK" } } },
+      "delete": { "operationId": "deleteOrder", "summary": "Delete order", "tags": ["orders"], "parameters": [{"name":"id","in":"path","required":true,"schema":{"type":"string"}}], "responses": { "204": { "description": "No Content" } } }
+    },
+    "/orders/{id}/items": {
+      "get": { "operationId": "listOrderItems", "summary": "List order items", "tags": ["orders"], "parameters": [{"name":"id","in":"path","required":true,"schema":{"type":"string"}}], "responses": { "200": { "description": "OK" } } },
+      "post": { "operationId": "addOrderItem", "summary": "Add order item", "tags": ["orders"], "parameters": [{"name":"id","in":"path","required":true,"schema":{"type":"string"}}], "responses": { "201": { "description": "Created" } } }
+    },
+    "/categories": {
+      "get": { "operationId": "listCategories", "summary": "List categories", "tags": ["categories"], "parameters": [], "responses": { "200": { "description": "OK" } } },
+      "post": { "operationId": "createCategory", "summary": "Create category", "tags": ["categories"], "parameters": [], "responses": { "201": { "description": "Created" } } }
+    },
+    "/categories/{id}": {
+      "get": { "operationId": "getCategory", "summary": "Get category", "tags": ["categories"], "parameters": [{"name":"id","in":"path","required":true,"schema":{"type":"string"}}], "responses": { "200": { "description": "OK" } } },
+      "put": { "operationId": "updateCategory", "summary": "Update category", "tags": ["categories"], "parameters": [{"name":"id","in":"path","required":true,"schema":{"type":"string"}}], "responses": { "200": { "description": "OK" } } },
+      "delete": { "operationId": "deleteCategory", "summary": "Delete category", "tags": ["categories"], "parameters": [{"name":"id","in":"path","required":true,"schema":{"type":"string"}}], "responses": { "204": { "description": "No Content" } } }
+    },
+    "/reviews": {
+      "get": { "operationId": "listReviews", "summary": "List reviews", "tags": ["reviews"], "parameters": [], "responses": { "200": { "description": "OK" } } },
+      "post": { "operationId": "createReview", "summary": "Create review", "tags": ["reviews"], "parameters": [], "responses": { "201": { "description": "Created" } } }
+    },
+    "/reviews/{id}": {
+      "get": { "operationId": "getReview", "summary": "Get review", "tags": ["reviews"], "parameters": [{"name":"id","in":"path","required":true,"schema":{"type":"string"}}], "responses": { "200": { "description": "OK" } } },
+      "delete": { "operationId": "deleteReview", "summary": "Delete review", "tags": ["reviews"], "parameters": [{"name":"id","in":"path","required":true,"schema":{"type":"string"}}], "responses": { "204": { "description": "No Content" } } }
+    },
+    "/payments": {
+      "get": { "operationId": "listPayments", "summary": "List payments", "tags": ["payments"], "parameters": [], "responses": { "200": { "description": "OK" } } },
+      "post": { "operationId": "createPayment", "summary": "Create payment", "tags": ["payments"], "parameters": [], "responses": { "201": { "description": "Created" } } }
+    },
+    "/payments/{id}": {
+      "get": { "operationId": "getPayment", "summary": "Get payment", "tags": ["payments"], "parameters": [{"name":"id","in":"path","required":true,"schema":{"type":"string"}}], "responses": { "200": { "description": "OK" } } },
+      "delete": { "operationId": "refundPayment", "summary": "Refund payment", "tags": ["payments"], "parameters": [{"name":"id","in":"path","required":true,"schema":{"type":"string"}}], "responses": { "200": { "description": "OK" } } }
+    },
+    "/inventory": {
+      "get": { "operationId": "listInventory", "summary": "List inventory", "tags": ["inventory"], "parameters": [], "responses": { "200": { "description": "OK" } } }
+    },
+    "/inventory/{id}": {
+      "get": { "operationId": "getInventoryItem", "summary": "Get inventory item", "tags": ["inventory"], "parameters": [{"name":"id","in":"path","required":true,"schema":{"type":"string"}}], "responses": { "200": { "description": "OK" } } },
+      "patch": { "operationId": "updateInventory", "summary": "Update inventory", "tags": ["inventory"], "parameters": [{"name":"id","in":"path","required":true,"schema":{"type":"string"}}], "responses": { "200": { "description": "OK" } } }
+    },
+    "/shipping": {
+      "get": { "operationId": "listShipments", "summary": "List shipments", "tags": ["shipping"], "parameters": [], "responses": { "200": { "description": "OK" } } },
+      "post": { "operationId": "createShipment", "summary": "Create shipment", "tags": ["shipping"], "parameters": [], "responses": { "201": { "description": "Created" } } }
+    },
+    "/shipping/{id}": {
+      "get": { "operationId": "getShipment", "summary": "Get shipment", "tags": ["shipping"], "parameters": [{"name":"id","in":"path","required":true,"schema":{"type":"string"}}], "responses": { "200": { "description": "OK" } } },
+      "patch": { "operationId": "updateShipment", "summary": "Update shipment", "tags": ["shipping"], "parameters": [{"name":"id","in":"path","required":true,"schema":{"type":"string"}}], "responses": { "200": { "description": "OK" } } }
+    },
+    "/notifications": {
+      "get": { "operationId": "listNotifications", "summary": "List notifications", "tags": ["notifications"], "parameters": [], "responses": { "200": { "description": "OK" } } }
+    },
+    "/notifications/{id}": {
+      "patch": { "operationId": "markNotificationRead", "summary": "Mark notification as read", "tags": ["notifications"], "parameters": [{"name":"id","in":"path","required":true,"schema":{"type":"string"}}], "responses": { "200": { "description": "OK" } } },
+      "delete": { "operationId": "deleteNotification", "summary": "Delete notification", "tags": ["notifications"], "parameters": [{"name":"id","in":"path","required":true,"schema":{"type":"string"}}], "responses": { "204": { "description": "No Content" } } }
+    },
+    "/auth/login": {
+      "post": { "operationId": "login", "summary": "Login", "tags": ["auth"], "parameters": [], "responses": { "200": { "description": "OK" } } }
+    },
+    "/auth/logout": {
+      "post": { "operationId": "logout", "summary": "Logout", "tags": ["auth"], "parameters": [], "responses": { "204": { "description": "No Content" } } }
+    },
+    "/auth/refresh": {
+      "post": { "operationId": "refreshToken", "summary": "Refresh token", "tags": ["auth"], "parameters": [], "responses": { "200": { "description": "OK" } } }
+    },
+    "/auth/password/reset": {
+      "post": { "operationId": "requestPasswordReset", "summary": "Request password reset", "tags": ["auth"], "parameters": [], "responses": { "200": { "description": "OK" } } }
+    },
+    "/auth/password/change": {
+      "post": { "operationId": "changePassword", "summary": "Change password", "tags": ["auth"], "parameters": [], "responses": { "200": { "description": "OK" } } }
+    },
+    "/analytics/sales": {
+      "get": { "operationId": "getSalesAnalytics", "summary": "Get sales analytics", "tags": ["analytics"], "parameters": [], "responses": { "200": { "description": "OK" } } }
+    },
+    "/analytics/users": {
+      "get": { "operationId": "getUserAnalytics", "summary": "Get user analytics", "tags": ["analytics"], "parameters": [], "responses": { "200": { "description": "OK" } } }
+    },
+    "/analytics/products": {
+      "get": { "operationId": "getProductAnalytics", "summary": "Get product analytics", "tags": ["analytics"], "parameters": [], "responses": { "200": { "description": "OK" } } }
+    },
+    "/search": {
+      "get": { "operationId": "search", "summary": "Global search", "tags": ["search"], "parameters": [{"name":"q","in":"query","required":true,"schema":{"type":"string"}}], "responses": { "200": { "description": "OK" } } }
+    },
+    "/search/products": {
+      "get": { "operationId": "searchProducts", "summary": "Search products", "tags": ["search"], "parameters": [{"name":"q","in":"query","required":true,"schema":{"type":"string"}}], "responses": { "200": { "description": "OK" } } }
+    },
+    "/search/users": {
+      "get": { "operationId": "searchUsers", "summary": "Search users", "tags": ["search"], "parameters": [{"name":"q","in":"query","required":true,"schema":{"type":"string"}}], "responses": { "200": { "description": "OK" } } }
+    },
+    "/settings": {
+      "get": { "operationId": "getSettings", "summary": "Get settings", "tags": ["settings"], "parameters": [], "responses": { "200": { "description": "OK" } } },
+      "put": { "operationId": "updateSettings", "summary": "Update settings", "tags": ["settings"], "parameters": [], "responses": { "200": { "description": "OK" } } }
+    },
+    "/health": {
+      "get": { "operationId": "healthCheck", "summary": "Health check", "tags": ["system"], "parameters": [], "responses": { "200": { "description": "OK" } } }
+    },
+    "/version": {
+      "get": { "operationId": "getVersion", "summary": "Get API version", "tags": ["system"], "parameters": [], "responses": { "200": { "description": "OK" } } }
+    }
+  },
+  "components": {
+    "schemas": {
+      "User": {
+        "type": "object",
+        "required": ["id", "email"],
+        "properties": {
+          "id": { "type": "string" },
+          "email": { "type": "string" },
+          "name": { "type": "string" }
+        }
+      },
+      "Product": {
+        "type": "object",
+        "required": ["id", "name", "price"],
+        "properties": {
+          "id": { "type": "string" },
+          "name": { "type": "string" },
+          "price": { "type": "number" }
+        }
+      }
+    }
+  }
+}
