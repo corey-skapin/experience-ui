@@ -1,6 +1,21 @@
 <!--
   Sync Impact Report
   ==================
+  Version change: 1.1.0 → 1.2.0 (MINOR — new governance rule added)
+  Modified principles: None
+  Added sections: None (integrated into existing section)
+  Removed sections: None
+  Expanded sections:
+    - Development Workflow — added "Main branch protection" bullet
+      prohibiting direct pushes to main; all changes must go through
+      PRs; Copilot agents must not push without explicit owner approval
+  Templates requiring updates:
+    - None — workflow rules are process-level, not template-structural
+  Follow-up TODOs: None
+-->
+<!--
+  Sync Impact Report (prior)
+  ==================
   Version change: 1.0.0 → 1.1.0 (MINOR — materially expanded guidance)
   Modified principles:
     - II. Testing Standards — added local-verification-before-commit
@@ -13,15 +28,10 @@
       pre-commit hooks (husky + lint-staged)
     - Quality Gates table — added "Local pre-commit" row
   Templates requiring updates:
-    - .specify/templates/plan-template.md        ✅ aligned (Constitution
-      Check section references principles generically)
-    - .specify/templates/spec-template.md         ✅ aligned (Requirements
-      and Success Criteria sections support all four principles)
-    - .specify/templates/tasks-template.md        ✅ aligned (Phase 1 Setup
-      includes "Configure linting and formatting tools" task; Phase N
-      covers cross-cutting quality concerns)
-    - .specify/templates/checklist-template.md    ✅ aligned (generic
-      category structure accommodates principle-driven items)
+    - .specify/templates/plan-template.md        ✅ aligned
+    - .specify/templates/spec-template.md         ✅ aligned
+    - .specify/templates/tasks-template.md        ✅ aligned
+    - .specify/templates/checklist-template.md    ✅ aligned
   Follow-up TODOs: None
 -->
 
@@ -65,7 +75,7 @@ by tests that validate its behavior before it is considered complete.
   that describe expected behavior, then implement until tests pass
   (Red-Green-Refactor).
 - Code coverage MUST NOT drop below the established project baseline.
-  New code SHOULD target ≥80% line coverage measured per feature
+  New code SHOULD target ÔëÑ80% line coverage measured per feature
   branch.
 - Tests MUST be deterministic: no reliance on network calls, timers,
   or execution order. External dependencies MUST be mocked or stubbed.
@@ -76,7 +86,7 @@ by tests that validate its behavior before it is considered complete.
 - The full test suite, linter, and formatter MUST pass locally before
   any change is committed or pushed. Developers MUST NOT push commits
   that have not cleared all local quality checks. This is a hard
-  requirement, not a suggestion—CI exists as a safety net, not as the
+  requirement, not a suggestionÔÇöCI exists as a safety net, not as the
   primary quality gate.
 - **Rationale**: A UI without tests is a UI that breaks silently.
   Testing is the primary mechanism for maintaining confidence during
@@ -156,6 +166,11 @@ production in this repository.
   or spec. PRs MUST include a description of what changed, why, and
   how to verify. Screenshots or recordings MUST accompany visual
   changes.
+- **Main branch protection**: Direct pushes to the `main` branch are
+  PROHIBITED. All changes to `main` MUST go through a pull request.
+  Copilot agents and automated tooling MUST NOT push to `main` without
+  explicit approval from the repository owner. When in doubt, ask
+  before pushing.
 - **Code review**: At least one approving review is required before
   merge. Reviewers MUST verify compliance with all four Core
   Principles.
@@ -208,4 +223,4 @@ conventions, or ad-hoc agreements.
   MUST be documented with rationale in the relevant PR or spec and
   tracked in the plan's Complexity Tracking table.
 
-**Version**: 1.1.0 | **Ratified**: 2026-02-26 | **Last Amended**: 2026-02-26
+**Version**: 1.2.0 | **Ratified**: 2026-02-26 | **Last Amended**: 2026-02-26
