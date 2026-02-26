@@ -67,7 +67,7 @@ describe('ConsolePanel visibility', () => {
         entries={[]}
         onClear={vi.fn()}
         isVisible={false}
-        tabId={TAB_ID}
+       
       />,
     );
     expect(container.firstChild).toBeNull();
@@ -79,7 +79,7 @@ describe('ConsolePanel visibility', () => {
         entries={[]}
         onClear={vi.fn()}
         isVisible
-        tabId={TAB_ID}
+       
       />,
     );
     expect(screen.getByRole('region', { name: /debug console/i })).toBeInTheDocument();
@@ -95,14 +95,14 @@ describe('Console entry display', () => {
       makeEntry('POST', '/login', 201),
     ];
     render(
-      <ConsolePanel entries={entries} onClear={vi.fn()} isVisible tabId={TAB_ID} />,
+      <ConsolePanel entries={entries} onClear={vi.fn()} isVisible />,
     );
     expect(screen.getByText(/2 requests/i)).toBeInTheDocument();
   });
 
   it('shows "No requests recorded" when entries list is empty', () => {
     render(
-      <ConsolePanel entries={[]} onClear={vi.fn()} isVisible tabId={TAB_ID} />,
+      <ConsolePanel entries={[]} onClear={vi.fn()} isVisible />,
     );
     expect(screen.getByText(/no requests recorded/i)).toBeInTheDocument();
   });
@@ -121,7 +121,7 @@ describe('Console filtering', () => {
   it('status filter hides non-matching entries', async () => {
     const user = userEvent.setup({ delay: null });
     render(
-      <ConsolePanel entries={entries} onClear={vi.fn()} isVisible tabId={TAB_ID} />,
+      <ConsolePanel entries={entries} onClear={vi.fn()} isVisible />,
     );
 
     const statusSelect = screen.getByRole('combobox', { name: /filter by status code/i });
@@ -135,7 +135,7 @@ describe('Console filtering', () => {
   it('URL filter shows only matching entries', async () => {
     const user = userEvent.setup({ delay: null });
     render(
-      <ConsolePanel entries={entries} onClear={vi.fn()} isVisible tabId={TAB_ID} />,
+      <ConsolePanel entries={entries} onClear={vi.fn()} isVisible />,
     );
 
     const urlInput = screen.getByRole('textbox', { name: /filter by url/i });
@@ -154,7 +154,7 @@ describe('Console clear', () => {
     const user = userEvent.setup({ delay: null });
     const onClear = vi.fn();
     render(
-      <ConsolePanel entries={[makeEntry('GET', '/test', 200)]} onClear={onClear} isVisible tabId={TAB_ID} />,
+      <ConsolePanel entries={[makeEntry('GET', '/test', 200)]} onClear={onClear} isVisible />,
     );
 
     await user.click(screen.getByRole('button', { name: /^clear$/i }));

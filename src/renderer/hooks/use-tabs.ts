@@ -50,16 +50,10 @@ export function useTabs(): UseTabsReturn {
     activeTab,
     activeTabId,
     tabCount: tabs.length,
-    createTab: useCallback(() => { createTab(); }, [createTab]),
+    createTab,
     closeTab,
-    switchTab: useCallback((id: string) => { switchTab(id); }, [switchTab]),
-    renameTab: useCallback(
-      (id: string, title: string) => { renameTab(id, title); },
-      [renameTab],
-    ),
-    reorderTab: useCallback(
-      (id: string, newIndex: number) => { reorderTab(id, newIndex); },
-      [reorderTab],
-    ),
+    switchTab,
+    renameTab,
+    reorderTab,
   };
 }

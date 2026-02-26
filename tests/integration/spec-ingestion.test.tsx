@@ -189,8 +189,8 @@ describe('Spec ingestion — happy path', () => {
     await user.keyboard('{Enter}');
 
     await waitFor(() => {
-      // Title appears in both tab bar and chat message - use getAllByText
-      expect(screen.getAllByText(/Petstore API/i).length).toBeGreaterThan(0);
+      // Title appears in both tab bar and chat - getAllByText handles multiple matches
+      expect(screen.getAllByText(/Petstore API/i)).not.toHaveLength(0);
     });
   });
 

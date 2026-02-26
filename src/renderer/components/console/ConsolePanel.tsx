@@ -14,7 +14,6 @@ export interface ConsolePanelProps {
   entries: ConsoleEntry[];
   onClear: () => void;
   isVisible: boolean;
-  tabId: string;
 }
 
 // ─── Status filter options ────────────────────────────────────────────────────
@@ -23,8 +22,7 @@ const STATUS_OPTIONS = ['all', '2xx', '3xx', '4xx', '5xx'] as const;
 
 // ─── Component ───────────────────────────────────────────────────────────────
 
-export function ConsolePanel({ entries, onClear, isVisible }: ConsolePanelProps): JSX.Element | null {
-  const {
+export function ConsolePanel({ entries, onClear, isVisible }: ConsolePanelProps): JSX.Element | null {  const {
     statusFilter,
     urlFilter,
     keywordFilter,

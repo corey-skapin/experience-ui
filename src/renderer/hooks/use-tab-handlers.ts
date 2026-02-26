@@ -136,7 +136,7 @@ export function useTabHandlers(tab: Tab | undefined): UseTabHandlersReturn {
         } else if (text.startsWith('http://') || text.startsWith('https://')) {
           let parsedUrl: URL;
           try { parsedUrl = new URL(text); }
-          catch { appendMessage('system', 'Error: Invalid URL — please provide a valid http(s) URL.'); return; }
+          catch (err) { appendMessage('system', `Error: Invalid URL — ${err instanceof Error ? err.message : 'please provide a valid http(s) URL.'}`); return; }
           if (parsedUrl.protocol !== 'http:' && parsedUrl.protocol !== 'https:') {
             appendMessage('system', 'Error: Only http:// and https:// URLs are supported.'); return;
           }

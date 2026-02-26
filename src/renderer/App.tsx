@@ -28,7 +28,8 @@ export default function App(): JSX.Element {
 
   const activeTab = useTabStore(selectActiveTab);
   const activeTabId = useTabStore((s) => s.activeTabId);
-  // Stable selector: memoize by activeTabId to avoid creating new function each render
+  // Memoize selector function reference to prevent Zustand re-subscription on every render;
+  // selectConsoleEntries returns EMPTY_CONSOLE_ENTRIES for missing keys (stable reference)
   const consoleEntriesSelector = useMemo(
     () => selectConsoleEntries(activeTabId ?? ''),
     [activeTabId],
@@ -189,7 +190,6 @@ export default function App(): JSX.Element {
               entries={consoleEntries}
               onClear={handleClearConsole}
               isVisible={consoleVisible}
-              tabId={activeTabId ?? ''}
             />
           </Panel>
         </PanelGroup>

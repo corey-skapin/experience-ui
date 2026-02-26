@@ -56,7 +56,8 @@ export function TabItem({ tab, isActive, onClose, onSwitch, onRename }: TabItemP
     [commitRename],
   );
 
-  const hasUnsavedSpec = tab.apiSpec !== null && tab.generatedInterface === null;
+  // spec loaded but interface generation not yet complete
+  const hasPendingGeneration = tab.apiSpec !== null && tab.generatedInterface === null;
 
   return (
     <div
@@ -91,7 +92,7 @@ export function TabItem({ tab, isActive, onClose, onSwitch, onRename }: TabItemP
           onDoubleClick={startEditing}
           title={tab.title}
         >
-          {hasUnsavedSpec && <span className="tab-item__unsaved-dot" aria-label="unsaved" />}
+          {hasPendingGeneration && <span className="tab-item__unsaved-dot" aria-label="unsaved" />}
           {truncated}
         </button>
       )}
